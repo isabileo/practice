@@ -596,7 +596,13 @@ body {
 
 @media (max-width: 480px) {
   .stage {
-    padding-top: 16px;
+    padding: 0;
+    gap: 0;
+    min-height: 100dvh;
+  }
+
+  .phone {
+    width: 100%;
   }
 
   .phone-bezel {
@@ -617,5 +623,21 @@ body {
 
   .caption {
     display: none;
+  }
+
+  .controls {
+    position: fixed;
+    left: 16px;
+    right: 16px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 50;
+    width: auto;
+    max-width: none;
+    padding: 12px;
+    border-radius: 20px;
+    background: rgba(8, 10, 18, 0.72);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 }

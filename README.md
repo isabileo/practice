@@ -29,13 +29,25 @@ After first launch, grant Live Activities when prompted (or Settings → Aura �
 
 > Apple does not allow third-party apps to replace the system lock-screen battery icon. Aura adds a **Live Activity** and in-app / StandBy charging face beside the system UI.
 
-## Preview without Xcode
+## Open on iPhone (no Mac)
+
+Safari on your iPhone → open this link (single file, works offline once loaded):
+
+**https://cdn.jsdelivr.net/gh/isabileo/practice@cursor/iphone-17-pro-max-app-7ed1/preview/open-on-iphone.html**
+
+Backup link:
+
+**https://raw.githack.com/isabileo/practice/cursor/iphone-17-pro-max-app-7ed1/preview/open-on-iphone.html**
+
+Then tap **Connect charger**. Optional: Share → **Add to Home Screen**.
+
+> Do not use the GitHub “Code” file page — that only shows source text and will not run the app.
+
+### Local preview (computer)
 
 ```bash
 cd preview && python3 -m http.server 8080
 ```
-
-Open the page and toggle **Charging** to see the lock-screen style UI at Pro Max size.
 
 ## Project layout
 
