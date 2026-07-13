@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Aura — iPhone 17 Pro Max Charging</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="stage">
+    <div class="phone" aria-label="iPhone 17 Pro Max preview">
+      <div class="phone-bezel">
+        <div class="screen" id="screen">
+          <div class="island" aria-hidden="true"></div>
+
+          <header class="status-bar">
+            <time id="clock">9:41</time>
+            <div class="status-glyphs" aria-hidden="true">
+              <span class="bars"></span>
+              <span class="wifi"></span>
+              <span class="battery-pill" id="statusBattery">64</span>
+            </div>
+          </header>
+
+          <!-- Lock Screen Live Activity banner -->
+          <aside class="live-activity" id="liveActivity" hidden>
+            <div class="la-ring" aria-hidden="true"></div>
+            <div class="la-copy">
+              <strong>Charging with Aura</strong>
+              <span>iPhone 17 Pro Max</span>
+            </div>
+            <div class="la-pct" id="laPercent">64%</div>
+          </aside>
+
+          <section class="lock" id="lock">
+            <p class="brand">AURA</p>
+            <p class="device">iPhone 17 Pro Max</p>
+
+            <div class="ring-wrap">
+              <svg class="ring" viewBox="0 0 200 200" aria-hidden="true">
+                <circle class="ring-track" cx="100" cy="100" r="86" />
+                <circle class="ring-progress" id="ringProgress" cx="100" cy="100" r="86" />
+              </svg>
+              <div class="ring-core">
+                <svg class="bolt" id="bolt" viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z" />
+                </svg>
+                <div class="percent">
+                  <span id="percent">64</span><small>%</small>
+                </div>
+                <p class="charge-label" id="chargeLabel">ON BATTERY</p>
+              </div>
+            </div>
+
+            <p class="watts" id="watts">Plug in to wake Aura</p>
+          </section>
+
+          <div class="orbs" aria-hidden="true">
+            <span class="orb orb-a"></span>
+            <span class="orb orb-b"></span>
+          </div>
+        </div>
+      </div>
+      <p class="caption">440 × 956 pt · iPhone 17 Pro Max</p>
+    </div>
+
+    <div class="controls">
+      <button type="button" class="cta" id="toggleCharge" aria-pressed="false">
+        Connect charger
+      </button>
+      <label class="slider-label">
+        Battery
+        <input type="range" id="level" min="1" max="100" value="64" />
+      </label>
+    </div>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>
