@@ -14,7 +14,7 @@ struct ChargingLockScreenView: View {
             ZStack {
                 atmosphere
 
-                // Colorful flowers stream in from the USB-C charging socket
+                // Random colorful mini-scenes stream from the USB-C socket
                 ChargingFlowerField(isActive: true, size: geo.size)
                     .ignoresSafeArea()
 

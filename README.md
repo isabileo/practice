@@ -5,7 +5,7 @@ When your iPhone is plugged in, **Aura** shows a cinematic charging status — i
 ## Features
 
 - **Immersive charging canvas** — full-bleed battery ring, charge %, and soft OLED motion when USB-C / MagSafe is connected
-- **Colorful charging flowers** — tiny blossoms stream into the screen from the bottom charging socket
+- **Random mini scenes from the socket** — flowers, rocket, drone, train, Ferrari, scooter, fish, sparrows, snake, sunrise, popcorn, sea beach (reshuffles every few seconds)
 - **Voltage · Current · Power** — live meters while charging, plus a clear **Fast charging confirmed** badge when on the peak USB-PD curve
 - **Lock Screen Live Activity** — stylish percentage + V/A while the phone is locked
 - **StandBy widget** — landscape charging face for bedside Pro Max use
