@@ -88,12 +88,13 @@ struct ChargingFlowerField: View {
                 guard isActive else { return }
                 if date >= nextChange {
                     scene = .random(excluding: scene)
-                    nextChange = date.addingTimeInterval(Double.random(in: 3.2...5.2))
-                    spawn(Int.random(in: 10...18), at: date)
+                    nextChange = date.addingTimeInterval(Double.random(in: 1.6...2.8))
+                    particles.removeAll()
+                    spawn(Int.random(in: 14...22), at: date)
                 }
                 prune(date)
                 tick += 1
-                if tick % 2 == 0 { spawn(Int.random(in: 1...4), at: date) }
+                if tick % 2 == 0 { spawn(Int.random(in: 2...5), at: date) }
             }
         }
         .allowsHitTesting(false)
