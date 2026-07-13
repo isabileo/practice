@@ -44,10 +44,11 @@ const MOTIONS = ["rise", "spiral", "fountain", "swirl", "zigzag", "burst", "wave
 let charging = false;
 let level = Number(levelInput.value);
 let particles = [];
-let scene = pick(SCENES);
-let motion = pick(MOTIONS);
-let nextSceneAt = 0;
+let scene = "flower";
+let motion = "rise";
+let nextSceneAt = Infinity;
 let sceneLabelEl = null;
+let animating = false;
 
 function pick(arr, exclude) {
   let next = arr[(Math.random() * arr.length) | 0];
@@ -58,7 +59,9 @@ function pick(arr, exclude) {
   return next;
 }
 
-function rand(a, b) { return a + Math.random() * (b - a); }
+function rand(a, b) {
+  return a + Math.random() * (b - a);
+}
 
 function ensureSceneLabel() {
   if (sceneLabelEl) return sceneLabelEl;
@@ -68,16 +71,84 @@ function ensureSceneLabel() {
   return sceneLabelEl;
 }
 
+function resizeCanvas() {
+  const rect = screen.getBoundingClientRect();
+  if (rect.width < 2 || rect.height < 2) return false;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  flowerCanvas.width = Math.floor(rect.width * dpr);
+  flowerCanvas.height = Math.floor(rect.height * dpr);
+  flowerCanvas.style.width = `${rect.width}px`;
+  flowerCanvas.style.height = `${rect.height}px`;
+  flowerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return true;
+}
+
+function spawn(count) {
+  const w = flowerCanvas.clientWidth || screen.clientWidth || 200;
+  const h = flowerCanvas.clientHeight || screen.clientHeight || 420;
+  for (let i = 0; i < count; i += 1) {
+    particles.push({
+      born: performance.now(),
+      life: rand(1400, 3000),
+      rise: h * rand(0.45, 0.95),
+      drift: (Math.random() - 0.5) * w * rand(0.55, 1.05),
+      amp: rand(8, 34),
+      freq: rand(0.5, 2.8),
+      phase: Math.random() * Math.PI * 2,
+      spin: rand(-3, 3),
+      scale: rand(0.5, 1.35),
+      color: pick(PALETTE),
+      scene,
+      motion: Math.random() < 0.6 ? motion : pick(MOTIONS),
+      petals: 4 + ((Math.random() * 4) | 0),
+    });
+  }
+  if (particles.length > 180) particles.splice(0, particles.length - 180);
+}
+
 function reshuffle(hard = true) {
   scene = pick(SCENES, scene);
   motion = pick(MOTIONS, motion);
   if (hard) particles = [];
-  nextSceneAt = performance.now() + rand(1600, 2800);
-  spawn(12 + ((Math.random() * 10) | 0));
+  nextSceneAt = performance.now() + rand(1600, 2600);
+  spawn(18 + ((Math.random() * 12) | 0));
   const label = ensureSceneLabel();
-  label.textContent = `${SCENE_TITLE[scene]} · ${motion}`.toUpperCase();
   label.hidden = !charging;
+  label.textContent = `${SCENE_TITLE[scene]} · ${motion}`.toUpperCase();
   if (sceneCaption) sceneCaption.textContent = `${SCENE_TITLE[scene]} · ${motion}`;
+}
+
+/** Show small app screen + start animations only after charger connects. */
+function connectCharger() {
+  charging = true;
+  animating = false;
+  particles = [];
+  stage.classList.add("is-charging-live");
+  renderMeters();
+
+  // Wait until the phone is laid out (it was display:none), then burst-animate.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      if (!charging) return;
+      resizeCanvas();
+      reshuffle(true);
+      spawn(20);
+      animating = true;
+      renderMeters();
+    });
+  });
+}
+
+function disconnectCharger() {
+  charging = false;
+  animating = false;
+  particles = [];
+  nextSceneAt = Infinity;
+  stage.classList.remove("is-charging-live");
+  flowerCtx.clearRect(0, 0, flowerCanvas.width || 1, flowerCanvas.height || 1);
+  const label = ensureSceneLabel();
+  label.hidden = true;
+  renderMeters();
 }
 
 function tickClock() {
@@ -89,59 +160,46 @@ function estimateElectricals(pct, on) {
   if (pct >= 100) return { v: 5.0, a: 0.05, w: 0.3, fast: false, mode: "Fully charged", label: "FULLY CHARGED" };
   const jV = rand(-0.08, 0.08);
   const jA = rand(-0.08, 0.08);
-  let v; let a; let fast; let mode;
-  if (pct < 50) { v = 9.2 + jV; a = 3.35 + jA; fast = true; mode = "Fast charging"; }
-  else if (pct < 80) { v = 9.0 + jV; a = 2.45 + jA; fast = true; mode = "Fast charging"; }
-  else if (pct < 92) { v = 5.2 + jV * 0.4; a = 1.15 + jA * 0.4; fast = false; mode = "Standard charge"; }
-  else { v = 5.1 + jV * 0.25; a = 0.55 + jA * 0.25; fast = false; mode = "Trickle charge"; }
-  v = Math.max(4.8, v); a = Math.max(0.05, a);
+  let v;
+  let a;
+  let fast;
+  let mode;
+  if (pct < 50) {
+    v = 9.2 + jV;
+    a = 3.35 + jA;
+    fast = true;
+    mode = "Fast charging";
+  } else if (pct < 80) {
+    v = 9.0 + jV;
+    a = 2.45 + jA;
+    fast = true;
+    mode = "Fast charging";
+  } else if (pct < 92) {
+    v = 5.2 + jV * 0.4;
+    a = 1.15 + jA * 0.4;
+    fast = false;
+    mode = "Standard charge";
+  } else {
+    v = 5.1 + jV * 0.25;
+    a = 0.55 + jA * 0.25;
+    fast = false;
+    mode = "Trickle charge";
+  }
+  v = Math.max(4.8, v);
+  a = Math.max(0.05, a);
   return {
     v: Math.round(v * 10) / 10,
     a: Math.round(a * 100) / 100,
     w: Math.round(v * a * 10) / 10,
-    fast, mode,
+    fast,
+    mode,
     label: fast ? "FAST CHARGING" : "CHARGING",
   };
 }
 
-function resizeCanvas() {
-  const rect = screen.getBoundingClientRect();
-  if (!rect.width || !rect.height) return;
-  const dpr = Math.min(window.devicePixelRatio || 1, 2);
-  flowerCanvas.width = Math.floor(rect.width * dpr);
-  flowerCanvas.height = Math.floor(rect.height * dpr);
-  flowerCanvas.style.width = `${rect.width}px`;
-  flowerCanvas.style.height = `${rect.height}px`;
-  flowerCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-
-function spawn(count) {
-  const w = flowerCanvas.clientWidth || 200;
-  const h = flowerCanvas.clientHeight || 400;
-  for (let i = 0; i < count; i += 1) {
-    particles.push({
-      born: performance.now(),
-      life: rand(1400, 3200),
-      rise: h * rand(0.4, 0.95),
-      drift: (Math.random() - 0.5) * w * rand(0.5, 1.1),
-      amp: rand(8, 34),
-      freq: rand(0.5, 2.8),
-      phase: Math.random() * Math.PI * 2,
-      spin: rand(-3, 3),
-      scale: rand(0.45, 1.35),
-      color: pick(PALETTE),
-      scene,
-      motion: Math.random() < 0.55 ? motion : pick(MOTIONS),
-      petals: 4 + ((Math.random() * 4) | 0),
-    });
-  }
-  if (particles.length > 180) particles.splice(0, particles.length - 180);
-}
-
 function pos(p, t, sx, sy) {
   const tt = t;
-  const m = p.motion;
-  switch (m) {
+  switch (p.motion) {
     case "spiral": {
       const r = p.amp * 0.3 + tt * p.amp * 2.4;
       const a = p.phase + t * Math.PI * 2 * p.freq;
@@ -164,7 +222,7 @@ function pos(p, t, sx, sy) {
     case "wave":
       return [sx + p.drift * tt, sy - tt * p.rise * 0.75 + Math.sin(t * Math.PI * 3 + p.phase) * p.amp];
     case "scatter":
-      return [sx + p.drift * Math.pow(tt, 0.7), sy - tt * p.rise * rand(0.85, 1) * (0.9 + 0.1 * Math.sin(p.phase))];
+      return [sx + p.drift * Math.pow(tt, 0.7), sy - tt * p.rise * 0.95];
     default: {
       const sway = Math.sin(t * Math.PI * 2 * p.freq + p.phase) * p.amp;
       return [sx + p.drift * tt + sway, sy - tt * p.rise];
@@ -187,38 +245,85 @@ function drawShape(ctx, p, rot) {
         ctx.ellipse(Math.cos(a) * 5, Math.sin(a) * 5, 2.1, 3.1, a, 0, Math.PI * 2);
         ctx.fill();
       }
-      ctx.beginPath(); ctx.arc(0, 0, 1.4, 0, Math.PI * 2); ctx.fillStyle = "#ffe08a"; ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, 1.4, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffe08a";
+      ctx.fill();
       break;
     case "rocket":
       ctx.beginPath();
-      ctx.moveTo(0, -7); ctx.lineTo(4, 2); ctx.lineTo(2, 2); ctx.lineTo(3, 6);
-      ctx.lineTo(-3, 6); ctx.lineTo(-2, 2); ctx.lineTo(-4, 2); ctx.closePath(); ctx.fill();
+      ctx.moveTo(0, -7);
+      ctx.lineTo(4, 2);
+      ctx.lineTo(2, 2);
+      ctx.lineTo(3, 6);
+      ctx.lineTo(-3, 6);
+      ctx.lineTo(-2, 2);
+      ctx.lineTo(-4, 2);
+      ctx.closePath();
+      ctx.fill();
       break;
     case "drone":
-      ctx.beginPath(); ctx.ellipse(0, 0, 3, 2, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(-5.5, -3, 2.3, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(5.5, -3, 2.3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(0, 0, 3, 2, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-5.5, -3, 2.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(5.5, -3, 2.3, 0, Math.PI * 2);
+      ctx.fill();
       break;
     case "train":
-      roundRect(ctx, -7, -3, 14, 7, 1.4); ctx.fill();
-      ctx.beginPath(); ctx.arc(-3.5, 4.5, 1.5, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(3.5, 4.5, 1.5, 0, Math.PI * 2); ctx.fill();
+      roundRect(ctx, -7, -3, 14, 7, 1.4);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-3.5, 4.5, 1.5, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(3.5, 4.5, 1.5, 0, Math.PI * 2);
+      ctx.fill();
       break;
     case "ferrari":
       ctx.beginPath();
-      ctx.moveTo(-8, 2); ctx.lineTo(-6, -2); ctx.lineTo(-2, -4); ctx.lineTo(3, -4);
-      ctx.lineTo(7, -1); ctx.lineTo(8, 2); ctx.closePath(); ctx.fill();
-      ctx.beginPath(); ctx.arc(-3.5, 2.5, 1.4, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(4, 2.5, 1.4, 0, Math.PI * 2); ctx.fill();
+      ctx.moveTo(-8, 2);
+      ctx.lineTo(-6, -2);
+      ctx.lineTo(-2, -4);
+      ctx.lineTo(3, -4);
+      ctx.lineTo(7, -1);
+      ctx.lineTo(8, 2);
+      ctx.closePath();
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-3.5, 2.5, 1.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(4, 2.5, 1.4, 0, Math.PI * 2);
+      ctx.fill();
       break;
     case "scooter":
-      ctx.beginPath(); ctx.arc(-4.5, 3.5, 1.7, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(4.5, 3.5, 1.7, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(-4, 3); ctx.lineTo(4, 3); ctx.lineTo(5, -4); ctx.lineTo(3, -5); ctx.stroke();
+      ctx.beginPath();
+      ctx.arc(-4.5, 3.5, 1.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(4.5, 3.5, 1.7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(-4, 3);
+      ctx.lineTo(4, 3);
+      ctx.lineTo(5, -4);
+      ctx.lineTo(3, -5);
+      ctx.stroke();
       break;
     case "fish":
-      ctx.beginPath(); ctx.ellipse(-1, 0, 4.3, 2.4, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.moveTo(3, 0); ctx.lineTo(7, -3); ctx.lineTo(7, 3); ctx.closePath(); ctx.fill();
+      ctx.beginPath();
+      ctx.ellipse(-1, 0, 4.3, 2.4, 0, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.moveTo(3, 0);
+      ctx.lineTo(7, -3);
+      ctx.lineTo(7, 3);
+      ctx.closePath();
+      ctx.fill();
       break;
     case "sparrows":
       ctx.beginPath();
@@ -238,7 +343,9 @@ function drawShape(ctx, p, rot) {
       ctx.stroke();
       break;
     case "sunrise":
-      ctx.beginPath(); ctx.arc(0, 0, 3, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath();
+      ctx.arc(0, 0, 3, 0, Math.PI * 2);
+      ctx.fill();
       for (let i = 0; i < 8; i += 1) {
         const a = (i / 8) * Math.PI * 2;
         ctx.beginPath();
@@ -248,9 +355,15 @@ function drawShape(ctx, p, rot) {
       }
       break;
     case "popcorn":
-      ctx.beginPath(); ctx.arc(-1, -2, 2.3, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(1.5, 0, 2.4, 0, Math.PI * 2); ctx.fill();
-      ctx.beginPath(); ctx.arc(-2, 1, 2.1, 0, Math.PI * 2); ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-1, -2, 2.3, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(1.5, 0, 2.4, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(-2, 1, 2.1, 0, Math.PI * 2);
+      ctx.fill();
       break;
     case "beach":
       ctx.beginPath();
@@ -260,7 +373,8 @@ function drawShape(ctx, p, rot) {
       ctx.quadraticCurveTo(-6, -3, 0, -5);
       ctx.fill();
       break;
-    default: break;
+    default:
+      break;
   }
   ctx.restore();
 }
@@ -282,14 +396,19 @@ function drawBackdrop(ctx, w, h) {
     g.addColorStop(0.55, "rgba(255,210,80,0.14)");
     g.addColorStop(1, "rgba(255,160,40,0)");
     ctx.fillStyle = g;
-    ctx.beginPath(); ctx.arc(w * 0.5, h * 0.4, 70, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath();
+    ctx.arc(w * 0.5, h * 0.4, 70, 0, Math.PI * 2);
+    ctx.fill();
   }
   if (scene === "beach") {
     ctx.fillStyle = "rgba(40,130,200,0.22)";
     ctx.beginPath();
     ctx.moveTo(0, h * 0.72);
     ctx.quadraticCurveTo(w * 0.5, h * 0.67, w, h * 0.74);
-    ctx.lineTo(w, h); ctx.lineTo(0, h); ctx.closePath(); ctx.fill();
+    ctx.lineTo(w, h);
+    ctx.lineTo(0, h);
+    ctx.closePath();
+    ctx.fill();
   }
 }
 
@@ -297,7 +416,7 @@ function paint(now) {
   const w = flowerCanvas.clientWidth;
   const h = flowerCanvas.clientHeight;
   flowerCtx.clearRect(0, 0, w || 1, h || 1);
-  if (!charging || !w) return;
+  if (!charging || !animating || !w) return;
 
   if (now >= nextSceneAt) reshuffle(true);
 
@@ -321,23 +440,20 @@ function paint(now) {
 }
 
 function loop(now) {
-  if (charging) {
-    if (Math.random() < 0.7) spawn(1 + ((Math.random() * 4) | 0));
-    // Occasional mid-scene motion flip so it keeps changing
-    if (Math.random() < 0.008) motion = pick(MOTIONS, motion);
+  if (charging && animating && Math.random() < 0.75) {
+    spawn(1 + ((Math.random() * 4) | 0));
   }
   paint(now || performance.now());
   requestAnimationFrame(loop);
 }
 
-function render() {
+function renderMeters() {
   const pct = Math.round(level);
   const elec = estimateElectricals(pct, charging);
   percentEl.textContent = String(pct);
   laPercent.textContent = `${pct}%`;
   statusBattery.textContent = String(pct);
   ringProgress.style.strokeDashoffset = String(CIRCUMFERENCE * (1 - level / 100));
-  stage.classList.toggle("is-charging-live", charging);
   screen.classList.toggle("is-charging", charging);
   liveActivity.hidden = !charging;
   chargeSocket.hidden = !charging;
@@ -345,20 +461,13 @@ function render() {
   toggle.setAttribute("aria-pressed", charging ? "true" : "false");
   toggle.textContent = charging ? "Unplug charger" : "Connect charger";
 
-  const label = ensureSceneLabel();
   if (!charging) {
     chargeLabel.textContent = "ON BATTERY";
-    watts.textContent = "Plug in to wake Aura";
+    watts.textContent = "Waiting for charger…";
     fastBadge.hidden = true;
-    particles = [];
-    label.hidden = true;
-    flowerCtx.clearRect(0, 0, flowerCanvas.clientWidth || 1, flowerCanvas.clientHeight || 1);
     return;
   }
 
-  label.hidden = false;
-  label.textContent = `${SCENE_TITLE[scene]} · ${motion}`.toUpperCase();
-  if (sceneCaption) sceneCaption.textContent = `${SCENE_TITLE[scene]} · ${motion}`;
   chargeLabel.textContent = elec.label;
   voltageEl.textContent = `${elec.v.toFixed(1)} V`;
   currentEl.textContent = `${elec.a.toFixed(2)} A`;
@@ -371,38 +480,34 @@ function render() {
   } else {
     fastBadge.textContent = elec.mode.toUpperCase();
     fastBadge.classList.add("is-standard");
-    watts.textContent = pct >= 100 ? `100% · ${elec.v.toFixed(1)} V` : `${elec.mode} · ${elec.w.toFixed(0)} W`;
+    watts.textContent =
+      pct >= 100 ? `100% · ${elec.v.toFixed(1)} V` : `${elec.mode} · ${elec.w.toFixed(0)} W`;
   }
 }
 
 toggle.addEventListener("click", () => {
-  charging = !charging;
-  if (charging) {
-    requestAnimationFrame(() => {
-      resizeCanvas();
-      reshuffle(true);
-      render();
-    });
-  }
-  render();
+  if (charging) disconnectCharger();
+  else connectCharger();
 });
 
 levelInput.addEventListener("input", () => {
   level = Number(levelInput.value);
-  render();
+  renderMeters();
 });
 
 setInterval(() => {
   if (charging && level < 100) {
     level = Math.min(100, level + 0.35);
     levelInput.value = String(Math.round(level));
+    renderMeters();
   }
-  render();
 }, 1200);
 
-window.addEventListener("resize", resizeCanvas);
+window.addEventListener("resize", () => {
+  if (charging) resizeCanvas();
+});
+
 tickClock();
 setInterval(tickClock, 30_000);
-resizeCanvas();
-render();
+disconnectCharger();
 requestAnimationFrame(loop);
