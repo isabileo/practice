@@ -4,10 +4,15 @@ When your iPhone is plugged in, **Aura** shows a cinematic charging status — i
 
 ## Features
 
-- **Immersive charging canvas** — full-bleed battery ring, charge %, watts cue, and soft OLED motion when USB-C / MagSafe is connected
-- **Lock Screen Live Activity** — stylish percentage + charging state while the phone is locked
+- **Immersive charging canvas** — full-bleed battery ring, charge %, and soft OLED motion when USB-C / MagSafe is connected
+- **Colorful charging flowers** — tiny blossoms stream into the screen from the bottom charging socket
+- **Voltage · Current · Power** — live meters while charging, plus a clear **Fast charging confirmed** badge when on the peak USB-PD curve
+- **Lock Screen Live Activity** — stylish percentage + V/A while the phone is locked
 - **StandBy widget** — landscape charging face for bedside Pro Max use
 - Tuned for **iPhone 17 Pro Max** (6.9″ · 2868×1320 · ~440×956 pt)
+
+> Voltage and current use a typical iPhone 17 Pro Max USB-PD estimate curve. Apple does not expose real charger V/A to third-party apps.
+
 
 ## Open in Xcode
 

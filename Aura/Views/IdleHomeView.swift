@@ -74,8 +74,10 @@ struct IdleHomeView: View {
                 Text("\(battery.percentText)% · \(battery.statusLabel)")
                     .font(.system(size: 16, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
-                Text(battery.estimatedWattsLabel)
-                    .font(.system(size: 13, weight: .regular, design: .rounded))
+                Text(battery.isCharging
+                     ? "\(battery.electricals.voltageText) · \(battery.electricals.currentText) · \(battery.electricals.wattsText)"
+                     : battery.estimatedWattsLabel)
+                    .font(.system(size: 13, weight: .regular, design: .rounded).monospacedDigit())
                     .foregroundStyle(.white.opacity(0.45))
             }
             Spacer()

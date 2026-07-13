@@ -4,7 +4,14 @@ import ActivityKit
 actor ChargeLiveActivityManager {
     private var activity: Activity<ChargeActivityAttributes>?
 
-    func sync(level: Double, isCharging: Bool, status: String) async -> Bool {
+    func sync(
+        level: Double,
+        isCharging: Bool,
+        status: String,
+        voltageText: String,
+        currentText: String,
+        isFastCharging: Bool
+    ) async -> Bool {
         guard ActivityAuthorizationInfo().areActivitiesEnabled else {
             await endAll()
             return false
@@ -14,6 +21,9 @@ actor ChargeLiveActivityManager {
             level: level,
             isCharging: isCharging,
             status: status,
+            voltageText: voltageText,
+            currentText: currentText,
+            isFastCharging: isFastCharging,
             updatedAt: Date()
         )
 
@@ -43,6 +53,9 @@ actor ChargeLiveActivityManager {
                         level: activity.content.state.level,
                         isCharging: false,
                         status: "On battery",
+                        voltageText: "—",
+                        currentText: "—",
+                        isFastCharging: false,
                         updatedAt: Date()
                     ),
                     staleDate: nil

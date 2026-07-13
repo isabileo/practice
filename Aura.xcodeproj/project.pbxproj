@@ -14,6 +14,7 @@
 		A10000000000000000000005 /* RootView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000005 /* RootView.swift */; };
 		A10000000000000000000006 /* ChargingLockScreenView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000006 /* ChargingLockScreenView.swift */; };
 		A10000000000000000000007 /* IdleHomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000007 /* IdleHomeView.swift */; };
+		A10000000000000000000010 /* ChargingFlowerField.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000010 /* ChargingFlowerField.swift */; };
 		A10000000000000000000008 /* ChargeActivityAttributes.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000008 /* ChargeActivityAttributes.swift */; };
 		A10000000000000000000009 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B10000000000000000000009 /* Assets.xcassets */; };
 		A1000000000000000000000A /* AuraChargeWidgetBundle.swift in Sources */ = {isa = PBXBuildFile; fileRef = B1000000000000000000000A /* AuraChargeWidgetBundle.swift */; };
@@ -56,6 +57,7 @@
 		B10000000000000000000005 /* RootView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RootView.swift; sourceTree = "<group>"; };
 		B10000000000000000000006 /* ChargingLockScreenView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargingLockScreenView.swift; sourceTree = "<group>"; };
 		B10000000000000000000007 /* IdleHomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IdleHomeView.swift; sourceTree = "<group>"; };
+		B10000000000000000000010 /* ChargingFlowerField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargingFlowerField.swift; sourceTree = "<group>"; };
 		B10000000000000000000008 /* ChargeActivityAttributes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ChargeActivityAttributes.swift; sourceTree = "<group>"; };
 		B10000000000000000000009 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B1000000000000000000000A /* AuraChargeWidgetBundle.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AuraChargeWidgetBundle.swift; sourceTree = "<group>"; };
@@ -169,6 +171,7 @@
 				B10000000000000000000005 /* RootView.swift */,
 				B10000000000000000000006 /* ChargingLockScreenView.swift */,
 				B10000000000000000000007 /* IdleHomeView.swift */,
+				B10000000000000000000010 /* ChargingFlowerField.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -280,6 +283,7 @@
 				A10000000000000000000005 /* RootView.swift in Sources */,
 				A10000000000000000000006 /* ChargingLockScreenView.swift in Sources */,
 				A10000000000000000000007 /* IdleHomeView.swift in Sources */,
+				A10000000000000000000010 /* ChargingFlowerField.swift in Sources */,
 				A10000000000000000000008 /* ChargeActivityAttributes.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

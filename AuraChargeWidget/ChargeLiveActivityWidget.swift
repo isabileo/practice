@@ -5,16 +5,20 @@ import SwiftUI
 struct ChargeLiveActivityWidget: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: ChargeActivityAttributes.self) { context in
-            // Lock Screen / Banner
             LockScreenChargeView(state: context.state, deviceName: context.attributes.deviceName)
                 .activityBackgroundTint(Color.black.opacity(0.82))
                 .activitySystemActionForegroundColor(.white)
         } dynamicIsland: { context in
             DynamicIsland {
                 DynamicIslandExpandedRegion(.leading) {
-                    Label("Aura", systemImage: "bolt.fill")
-                        .font(.headline)
-                        .foregroundStyle(Color(red: 1.0, green: 0.55, blue: 0.18))
+                    VStack(alignment: .leading, spacing: 2) {
+                        Label(context.state.isFastCharging ? "Fast" : "Aura", systemImage: "bolt.fill")
+                            .font(.headline)
+                            .foregroundStyle(Color(red: 1.0, green: 0.55, blue: 0.18))
+                        Text("\(context.state.voltageText) · \(context.state.currentText)")
+                            .font(.caption2.monospacedDigit())
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 DynamicIslandExpandedRegion(.trailing) {
                     Text("\(Int((context.state.level * 100).rounded()))%")
@@ -26,7 +30,7 @@ struct ChargeLiveActivityWidget: Widget {
                         .foregroundStyle(.secondary)
                 }
             } compactLeading: {
-                Image(systemName: "bolt.fill")
+                Image(systemName: context.state.isFastCharging ? "bolt.badge.automatic.fill" : "bolt.fill")
                     .foregroundStyle(Color(red: 1.0, green: 0.78, blue: 0.32))
             } compactTrailing: {
                 Text("\(Int((context.state.level * 100).rounded()))%")
@@ -44,7 +48,7 @@ struct LockScreenChargeView: View {
     let deviceName: String
 
     var body: some View {
-        HStack(spacing: 16) {
+        HStack(spacing: 14) {
             ZStack {
                 Circle()
                     .stroke(Color.white.opacity(0.12), lineWidth: 6)
@@ -65,27 +69,28 @@ struct LockScreenChargeView: View {
                     .rotationEffect(.degrees(-90))
                     .frame(width: 52, height: 52)
 
-                Image(systemName: "bolt.fill")
-                    .font(.system(size: 14, weight: .bold))
+                Image(systemName: state.isFastCharging ? "bolt.badge.automatic.fill" : "bolt.fill")
+                    .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(Color(red: 1.0, green: 0.78, blue: 0.32))
             }
 
             VStack(alignment: .leading, spacing: 4) {
-                Text(state.isCharging ? "Charging with Aura" : state.status)
+                Text(state.isFastCharging ? "Fast charging confirmed" : state.status)
                     .font(.headline)
                     .foregroundStyle(.white)
-                Text(deviceName)
-                    .font(.caption)
+                Text("\(state.voltageText)  ·  \(state.currentText)  ·  \(deviceName)")
+                    .font(.caption.monospacedDigit())
                     .foregroundStyle(.white.opacity(0.55))
+                    .lineLimit(1)
             }
 
-            Spacer()
+            Spacer(minLength: 8)
 
             Text("\(Int((state.level * 100).rounded()))%")
                 .font(.system(size: 28, weight: .light, design: .rounded).monospacedDigit())
                 .foregroundStyle(.white)
         }
-        .padding(.horizontal, 20)
+        .padding(.horizontal, 18)
         .padding(.vertical, 14)
     }
 }

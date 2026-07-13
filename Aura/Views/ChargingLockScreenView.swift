@@ -14,6 +14,10 @@ struct ChargingLockScreenView: View {
             ZStack {
                 atmosphere
 
+                // Colorful flowers stream in from the USB-C charging socket
+                ChargingFlowerField(isActive: true, size: geo.size)
+                    .ignoresSafeArea()
+
                 VStack(spacing: 0) {
                     Spacer(minLength: geo.safeAreaInsets.top + 28)
 
@@ -56,17 +60,21 @@ struct ChargingLockScreenView: View {
 
                     Spacer()
 
-                    VStack(spacing: 10) {
+                    VStack(spacing: 16) {
+                        FastChargeBadge(isFast: battery.electricals.isFastCharging, mode: battery.electricals.modeLabel)
+
+                        ElectricalMeters(electricals: battery.electricals)
+
                         Text(battery.estimatedWattsLabel)
-                            .font(.system(size: 16, weight: .medium, design: .rounded))
+                            .font(.system(size: 14, weight: .medium, design: .rounded))
                             .foregroundStyle(ChargeTheme.mist)
 
                         Text("Lock screen Live Activity active")
-                            .font(.system(size: 13, weight: .regular, design: .rounded))
+                            .font(.system(size: 12, weight: .regular, design: .rounded))
                             .foregroundStyle(.white.opacity(0.35))
                             .opacity(battery.activityEnabled ? 1 : 0)
                     }
-                    .padding(.bottom, max(36, geo.safeAreaInsets.bottom + 24))
+                    .padding(.bottom, max(28, geo.safeAreaInsets.bottom + 18))
                 }
                 .padding(.horizontal, 28)
             }
@@ -145,5 +153,71 @@ struct ChargeRing: View {
                 .rotationEffect(.degrees(-90))
                 .animation(.easeInOut(duration: 0.6), value: progress)
         }
+    }
+}
+
+struct FastChargeBadge: View {
+    let isFast: Bool
+    let mode: String
+
+    var body: some View {
+        HStack(spacing: 8) {
+            Image(systemName: isFast ? "bolt.badge.automatic.fill" : "bolt.fill")
+                .font(.system(size: 13, weight: .bold))
+            Text(isFast ? "FAST CHARGING CONFIRMED" : mode.uppercased())
+                .font(.system(size: 12, weight: .bold, design: .rounded))
+                .tracking(1.4)
+        }
+        .foregroundStyle(isFast ? Color.black.opacity(0.85) : ChargeTheme.mist)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 8)
+        .background(
+            Capsule()
+                .fill(isFast ? ChargeTheme.molten : Color.white.opacity(0.08))
+        )
+        .overlay(
+            Capsule()
+                .stroke(isFast ? Color.clear : Color.white.opacity(0.12), lineWidth: 1)
+        )
+        .animation(.easeInOut(duration: 0.35), value: isFast)
+    }
+}
+
+struct ElectricalMeters: View {
+    let electricals: ChargeElectricals
+
+    var body: some View {
+        HStack(spacing: 0) {
+            meter(title: "VOLTAGE", value: electricals.voltageVolts == 0 ? "—" : electricals.voltageText)
+            Divider()
+                .frame(height: 36)
+                .overlay(Color.white.opacity(0.15))
+            meter(title: "CURRENT", value: electricals.currentAmps == 0 ? "—" : electricals.currentText)
+            Divider()
+                .frame(height: 36)
+                .overlay(Color.white.opacity(0.15))
+            meter(title: "POWER", value: electricals.watts == 0 ? "—" : electricals.wattsText)
+        }
+        .padding(.vertical, 12)
+        .background(Color.white.opacity(0.06))
+        .overlay(
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(Color.white.opacity(0.1), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    private func meter(title: String, value: String) -> some View {
+        VStack(spacing: 4) {
+            Text(title)
+                .font(.system(size: 10, weight: .semibold, design: .rounded))
+                .tracking(1.2)
+                .foregroundStyle(.white.opacity(0.42))
+            Text(value)
+                .font(.system(size: 18, weight: .semibold, design: .rounded).monospacedDigit())
+                .foregroundStyle(.white)
+                .contentTransition(.numericText())
+        }
+        .frame(maxWidth: .infinity)
     }
 }
