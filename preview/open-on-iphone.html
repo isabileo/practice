@@ -258,7 +258,7 @@ html, body {
   <main class="stage" id="stage">
     <div class="idle-hint" id="idleHint">
       <div class="brand-idle">AURA</div>
-      <p>App screen stays hidden until you connect the charger.</p>
+      <p>Safari can’t sense a real charger. Tap below to preview — the real iOS app shows this automatically when you plug in.</p>
     </div>
 
     <div class="phone" id="phone" aria-label="Small Aura app screen">
@@ -786,8 +786,7 @@ function renderMeters() {
   liveActivity.hidden = !charging;
   chargeSocket.hidden = !charging;
   meters.hidden = !charging;
-  toggle.setAttribute("aria-pressed", charging ? "true" : "false");
-  toggle.textContent = charging ? "Unplug charger" : "Connect charger";
+  toggle.textContent = charging ? "Unplug (preview)" : "Preview: connect charger";
 
   if (!charging) {
     chargeLabel.textContent = "ON BATTERY";

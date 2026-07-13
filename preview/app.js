@@ -458,8 +458,7 @@ function renderMeters() {
   liveActivity.hidden = !charging;
   chargeSocket.hidden = !charging;
   meters.hidden = !charging;
-  toggle.setAttribute("aria-pressed", charging ? "true" : "false");
-  toggle.textContent = charging ? "Unplug charger" : "Connect charger";
+  toggle.textContent = charging ? "Unplug (preview)" : "Preview: connect charger";
 
   if (!charging) {
     chargeLabel.textContent = "ON BATTERY";
