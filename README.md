@@ -29,6 +29,18 @@ After first launch, grant Live Activities when prompted (or Settings → Aura �
 
 > Apple does not allow third-party apps to replace the system lock-screen battery icon. Aura adds a **Live Activity** and in-app / StandBy charging face beside the system UI.
 
+## CUT — browser video editor
+
+Effortless timeline editing in the browser (import, trim, split, titles, looks, export):
+
+```bash
+cd video-editor
+npm install
+npm run dev
+```
+
+See [`video-editor/README.md`](video-editor/README.md) for details.
+
 ## Preview without Xcode
 
 ```bash
