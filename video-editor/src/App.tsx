@@ -241,13 +241,14 @@ export default function App() {
     const local = currentTime - clip.offset;
     if (local <= 0.05 || local >= clipDuration(clip) - 0.05) return;
     const splitSource = clip.inPoint + local * clip.speed;
+    const rightId = uuid();
     const left: TimelineClip = {
       ...clip,
       outPoint: splitSource,
     };
     const right: TimelineClip = {
       ...clip,
-      id: uuid(),
+      id: rightId,
       inPoint: splitSource,
       offset: currentTime,
     };
@@ -255,7 +256,9 @@ export default function App() {
       ...prev,
       clips: prev.clips.flatMap((c) => (c.id === clip.id ? [left, right] : [c])),
     }));
-    setSelection({ kind: "clip", id: right.id });
+    setSelection({ kind: "clip", id: rightId });
+    // Nudge zoom if the cut is hard to see
+    setPxPerSec((z) => Math.max(z, 80));
   }
 
   function addText() {
@@ -506,7 +509,11 @@ export default function App() {
                   muted={false}
                 />
               ) : (
-                <div className="preview-empty">No clip at playhead</div>
+                <div className="preview-empty">
+                  {activeTexts.length > 0
+                    ? null
+                    : "Move the playhead onto a clip"}
+                </div>
               )}
               {activeTexts.map((t) => (
                 <div
