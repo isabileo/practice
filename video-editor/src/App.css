@@ -349,6 +349,17 @@ select {
   background: var(--accent-hot);
 }
 
+.btn.accent {
+  background: var(--accent-dim);
+  border-color: rgba(45, 212, 191, 0.45);
+  color: var(--accent-hot);
+}
+
+.btn.accent:hover:not(:disabled) {
+  background: rgba(45, 212, 191, 0.28);
+  border-color: var(--accent);
+}
+
 .btn.danger {
   background: transparent;
   border-color: rgba(240, 113, 120, 0.4);
@@ -887,6 +898,119 @@ select {
   height: 100%;
   background: var(--accent);
   transition: width 0.15s linear;
+}
+
+.auto-panel {
+  width: min(480px, 94vw);
+  text-align: left;
+}
+
+.auto-panel h2 {
+  text-align: left;
+}
+
+.auto-lead {
+  margin: 0 0 1rem !important;
+  line-height: 1.45;
+}
+
+.preset-row {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.preset-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+  text-align: left;
+  padding: 0.7rem 0.85rem;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--bg-elev);
+  cursor: pointer;
+  transition:
+    border-color 0.2s,
+    background 0.2s;
+}
+
+.preset-card strong {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+.preset-card span {
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.preset-card:hover:not(:disabled) {
+  border-color: rgba(45, 212, 191, 0.4);
+}
+
+.preset-card.active {
+  border-color: var(--accent);
+  background: var(--accent-dim);
+}
+
+.preset-card.active span {
+  color: rgba(244, 247, 246, 0.75);
+}
+
+.auto-status {
+  margin-bottom: 0.85rem;
+}
+
+.auto-status p {
+  margin: 0 0 0.5rem !important;
+  color: var(--text) !important;
+  font-size: 0.88rem !important;
+}
+
+.auto-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 0.5rem;
+  margin: 0 0 1rem;
+  padding: 0.75rem;
+  border-radius: 12px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+}
+
+.auto-stats div {
+  text-align: center;
+}
+
+.auto-stats dt {
+  margin: 0;
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.auto-stats dd {
+  margin: 0.25rem 0 0;
+  font-variant-numeric: tabular-nums;
+  font-weight: 700;
+  font-size: 0.95rem;
+}
+
+.auto-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  justify-content: flex-end;
+}
+
+@media (max-width: 520px) {
+  .auto-stats {
+    grid-template-columns: repeat(2, 1fr);
+  }
 }
 
 @media (max-width: 900px) {

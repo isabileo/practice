@@ -10,6 +10,7 @@ Import clips, trim and split on a timeline, add titles and looks, then export �
 - **Timeline editing** — move, trim (in/out handles), split at playhead (`S`)
 - **Titles** — overlay text with size, color, and timing
 - **Looks** — Warm, Cool, Mono, Vivid, Fade
+- **Auto Edit** — listen for dead air & long pauses, then cut those mistakes automatically (Gentle / Balanced / Aggressive)
 - **Speed & volume** per clip
 - **Export** — download a WebM of your edit
 - **Keyboard** — `Space` play/pause · `S` split · `←`/`→` nudge · `Delete` remove
@@ -35,8 +36,11 @@ npm run preview
 ## Tips
 
 1. Drop one or more videos on the welcome screen — they’re placed end-to-end on the timeline.
-2. Click a clip to trim in the inspector, or drag the edge handles on the timeline.
-3. Press **Title** to add on-screen text at the playhead.
-4. Hit **Export** when you’re ready; rendering runs in the browser (realtime-ish).
+2. Click **Auto Edit** to remove silence and hesitations before you fine-tune. Use **Undo Auto** if you want the original cuts back.
+3. Click a clip to trim in the inspector, or drag the edge handles on the timeline.
+4. Press **Title** to add on-screen text at the playhead.
+5. Hit **Export** when you’re ready; rendering runs in the browser (realtime-ish).
 
 > Export uses the Canvas + MediaRecorder APIs and saves **WebM**. For other containers, convert with ffmpeg after download.
+>
+> Auto Edit needs an audio track. Silent or music-only clips may have little to cut.

@@ -15,6 +15,13 @@ import { loadMediaFromFile } from "./lib/media";
 import { downloadBlob, exportProject } from "./lib/export";
 import { FILTER_CSS, FILTER_LABELS } from "./lib/filters";
 import { clamp, formatTime } from "./lib/time";
+import {
+  AUTO_EDIT_PRESETS,
+  analyzeProjectForAutoEdit,
+  applyAutoEdit,
+  type AutoEditPreset,
+  type AutoEditPreview,
+} from "./lib/autoEdit";
 import "./App.css";
 
 type Selection =
@@ -36,11 +43,19 @@ export default function App() {
   const [exportRatio, setExportRatio] = useState(0);
   const [exportLabel, setExportLabel] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [autoOpen, setAutoOpen] = useState(false);
+  const [autoPreset, setAutoPreset] = useState<AutoEditPreset>("balanced");
+  const [autoAnalyzing, setAutoAnalyzing] = useState(false);
+  const [autoLabel, setAutoLabel] = useState("");
+  const [autoRatio, setAutoRatio] = useState(0);
+  const [autoPreview, setAutoPreview] = useState<AutoEditPreview | null>(null);
+  const [undoClips, setUndoClips] = useState<TimelineClip[] | null>(null);
 
   const videoRef = useRef<HTMLVideoElement>(null);
   const rafRef = useRef<number>(0);
   const playStartRef = useRef({ wall: 0, time: 0 });
   const abortRef = useRef<AbortController | null>(null);
+  const autoAbortRef = useRef<AbortController | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const duration = useMemo(
@@ -325,6 +340,77 @@ export default function App() {
     }
   }
 
+  function openAutoEdit() {
+    setAutoOpen(true);
+    setAutoPreview(null);
+    setAutoLabel("");
+    setAutoRatio(0);
+    setPlaying(false);
+  }
+
+  async function runAutoAnalyze(preset: AutoEditPreset = autoPreset) {
+    if (project.clips.length === 0) {
+      setError("Add clips before Auto Edit.");
+      return;
+    }
+    setAutoAnalyzing(true);
+    setAutoPreview(null);
+    setAutoLabel("Starting…");
+    setAutoRatio(0);
+    const abort = new AbortController();
+    autoAbortRef.current = abort;
+    try {
+      const preview = await analyzeProjectForAutoEdit(
+        project,
+        AUTO_EDIT_PRESETS[preset].options,
+        (label, ratio) => {
+          setAutoLabel(label);
+          setAutoRatio(ratio);
+        },
+        abort.signal,
+      );
+      setAutoPreview(preview);
+      setAutoLabel(
+        preview.silenceRemoved < 0.05
+          ? "Looks clean — little silence to cut"
+          : `Ready to remove ${formatTime(preview.silenceRemoved)} of dead air`,
+      );
+    } catch (e) {
+      if (e instanceof DOMException && e.name === "AbortError") {
+        setAutoLabel("Cancelled");
+      } else {
+        setError(e instanceof Error ? e.message : "Auto Edit analysis failed");
+        setAutoOpen(false);
+      }
+    } finally {
+      setAutoAnalyzing(false);
+      autoAbortRef.current = null;
+    }
+  }
+
+  function applyAutoEditResult() {
+    if (!autoPreview) return;
+    setUndoClips(project.clips);
+    const nextClips = applyAutoEdit(project, autoPreview);
+    if (nextClips.length === 0) {
+      setError("Auto Edit would remove everything — try Gentle.");
+      return;
+    }
+    setProject((prev) => ({ ...prev, clips: nextClips }));
+    setSelection(null);
+    setCurrentTime(0);
+    setPlaying(false);
+    setAutoOpen(false);
+    setAutoPreview(null);
+  }
+
+  function undoAutoEdit() {
+    if (!undoClips) return;
+    setProject((prev) => ({ ...prev, clips: undoClips }));
+    setUndoClips(null);
+    setCurrentTime(0);
+  }
+
   function seekFromPreview(clientX: number, el: HTMLElement) {
     const rect = el.getBoundingClientRect();
     const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
@@ -380,8 +466,8 @@ export default function App() {
         {error && <p className="toast-error">{error}</p>}
 
         <ul className="welcome-hints">
+          <li>Auto Edit removes pauses &amp; dead air</li>
           <li>Trim &amp; split on the timeline</li>
-          <li>Add titles in one click</li>
           <li>Export when you’re done</li>
         </ul>
       </div>
@@ -419,6 +505,20 @@ export default function App() {
               if (e.target.files) void importFiles(e.target.files);
             }}
           />
+          <button
+            type="button"
+            className="btn accent"
+            onClick={openAutoEdit}
+            disabled={project.clips.length === 0}
+            title="Cut silence and long pauses automatically"
+          >
+            Auto Edit
+          </button>
+          {undoClips && (
+            <button type="button" className="btn ghost" onClick={undoAutoEdit}>
+              Undo Auto
+            </button>
+          )}
           <button type="button" className="btn ghost" onClick={addText}>
             Title
           </button>
@@ -842,6 +942,103 @@ export default function App() {
             >
               Cancel
             </button>
+          </div>
+        </div>
+      )}
+
+      {autoOpen && (
+        <div className="export-overlay" role="dialog" aria-modal aria-labelledby="auto-edit-title">
+          <div className="export-panel auto-panel">
+            <h2 id="auto-edit-title">Auto Edit</h2>
+            <p className="auto-lead">
+              CUT listens for dead air and long pauses, then cuts those mistakes
+              before you fine-tune by hand.
+            </p>
+
+            <div className="preset-row" role="radiogroup" aria-label="Auto Edit strength">
+              {(Object.keys(AUTO_EDIT_PRESETS) as AutoEditPreset[]).map((key) => {
+                const preset = AUTO_EDIT_PRESETS[key];
+                return (
+                  <button
+                    key={key}
+                    type="button"
+                    role="radio"
+                    aria-checked={autoPreset === key}
+                    className={`preset-card ${autoPreset === key ? "active" : ""}`}
+                    disabled={autoAnalyzing}
+                    onClick={() => {
+                      setAutoPreset(key);
+                      setAutoPreview(null);
+                    }}
+                  >
+                    <strong>{preset.label}</strong>
+                    <span>{preset.hint}</span>
+                  </button>
+                );
+              })}
+            </div>
+
+            {(autoAnalyzing || autoLabel) && (
+              <div className="auto-status">
+                <p>{autoLabel || "Working…"}</p>
+                {autoAnalyzing && (
+                  <div className="export-bar">
+                    <div style={{ width: `${Math.max(autoRatio, 0.08) * 100}%` }} />
+                  </div>
+                )}
+              </div>
+            )}
+
+            {autoPreview && !autoAnalyzing && (
+              <dl className="auto-stats">
+                <div>
+                  <dt>Before</dt>
+                  <dd>{formatTime(autoPreview.originalDuration, true)}</dd>
+                </div>
+                <div>
+                  <dt>After</dt>
+                  <dd>{formatTime(autoPreview.newDuration, true)}</dd>
+                </div>
+                <div>
+                  <dt>Removed</dt>
+                  <dd>{formatTime(autoPreview.silenceRemoved, true)}</dd>
+                </div>
+                <div>
+                  <dt>Cuts</dt>
+                  <dd>{autoPreview.cutsRemoved}</dd>
+                </div>
+              </dl>
+            )}
+
+            <div className="auto-actions">
+              <button
+                type="button"
+                className="btn ghost"
+                onClick={() => {
+                  autoAbortRef.current?.abort();
+                  setAutoOpen(false);
+                  setAutoPreview(null);
+                }}
+              >
+                Close
+              </button>
+              <button
+                type="button"
+                className="btn ghost"
+                disabled={autoAnalyzing}
+                onClick={() => void runAutoAnalyze()}
+              >
+                {autoAnalyzing ? "Analyzing…" : autoPreview ? "Re-analyze" : "Analyze"}
+              </button>
+              <button
+                type="button"
+                className="btn primary"
+                disabled={autoAnalyzing || !autoPreview || autoPreview.silenceRemoved < 0.05}
+                onClick={applyAutoEditResult}
+              >
+                Apply cuts
+              </button>
+            </div>
           </div>
         </div>
       )}
