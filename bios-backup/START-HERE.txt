@@ -1,0 +1,25 @@
+BIOS COPY / UPLOAD — USB BOOT KIT
+=================================
+
+What you get when you boot:
+  1) Copy BIOS    — save firmware from this PC onto the pendrive
+  2) Upload BIOS  — write a saved backup back (if BIOS is damaged but PC still POSTs)
+
+How to use (short):
+  1. Create a bootable Linux USB (Ventoy or Rufus) — see BOOT-USB.md
+  2. Copy this whole "bios-backup" folder onto the USB (or run prepare-usb.sh)
+  3. Boot the Windows 7 PC from the USB (change boot order / F12 boot menu)
+  4. In the live Linux desktop, open Terminal and run:
+
+       sudo bash /media/*/bios-backup/bios-menu.sh
+
+     (path may differ — find the USB and use that path)
+
+  5. Pick Copy or Upload from the menu
+
+IMPORTANT:
+  - Copy a good BIOS NOW, before it crashes.
+  - Upload only a dump taken from THIS same motherboard.
+  - If the PC has NO power-on / NO logo at all, a USB tool cannot help —
+    use Dual-BIOS, vendor USB recovery, or a hardware SPI programmer.
+  - Wrong upload can brick the board permanently.
