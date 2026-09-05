@@ -59,10 +59,15 @@ list_disks() {
     echo "lsblk not found. Install util-linux."
     return 1
   fi
-  # TYPE disk only (skip rom/loop)
-  lsblk -d -o NAME,SIZE,MODEL,TRAN,ROTA,TYPE,RM | awk 'NR==1 || $6=="disk"'
+  printf "  %-12s %-10s %-8s %s\n" "NAME" "SIZE" "BUS" "MODEL"
+  local name size typ tran model
+  while read -r name size typ tran model; do
+    [[ "${typ}" != "disk" ]] && continue
+    [[ "${name}" == loop* ]] && continue
+    printf "  %-12s %-10s %-8s %s\n" "${name}" "${size}" "${tran:--}" "${model:--}"
+  done < <(lsblk -dn -o NAME,SIZE,TYPE,TRAN,MODEL)
   echo
-  echo "Detail:"
+  echo "Full layout (disks + partitions):"
   lsblk -o NAME,SIZE,FSTYPE,LABEL,MOUNTPOINT,TYPE
 }
 
@@ -340,12 +345,17 @@ format_disk() {
 
 disk_actions_menu() {
   local name="$1"
+  local only_one="${2:-0}"
   local choice
 
   while true; do
     clear
     echo "${BLD}${CYN}========================================${RST}"
-    echo "${BLD}${CYN}   Disk selected: /dev/${name}${RST}"
+    if [[ "${only_one}" == "1" ]]; then
+      echo "${BLD}${CYN}   Only disk: /dev/${name}${RST}"
+    else
+      echo "${BLD}${CYN}   Disk selected: /dev/${name}${RST}"
+    fi
     echo "${BLD}${CYN}========================================${RST}"
     echo
     show_disk_partitions "${name}" || true
@@ -353,18 +363,31 @@ disk_actions_menu() {
     echo "  1) Refresh — show partitions & space again"
     echo "  2) Format this disk (wipe + one new partition)"
     echo "  3) Delete all partitions (make disk with no partitions)"
-    echo "  4) Select another disk"
-    echo "  5) Back to main menu"
-    echo
-    read -r -p "Choose option [1-5]: " choice
-    case "${choice}" in
-      1) pause ;;
-      2) format_disk "${name}"; pause ;;
-      3) wipe_partitions_only "${name}"; pause ;;
-      4) return 0 ;;
-      5) exit 0 ;;
-      *) echo "Invalid choice."; pause ;;
-    esac
+    if [[ "${only_one}" == "1" ]]; then
+      echo "  4) Back to main menu"
+      echo
+      read -r -p "Choose option [1-4]: " choice
+      case "${choice}" in
+        1) pause ;;
+        2) format_disk "${name}"; pause ;;
+        3) wipe_partitions_only "${name}"; pause ;;
+        4) exit 0 ;;
+        *) echo "Invalid choice."; pause ;;
+      esac
+    else
+      echo "  4) Select another disk"
+      echo "  5) Back to main menu"
+      echo
+      read -r -p "Choose option [1-5]: " choice
+      case "${choice}" in
+        1) pause ;;
+        2) format_disk "${name}"; pause ;;
+        3) wipe_partitions_only "${name}"; pause ;;
+        4) return 0 ;;
+        5) exit 0 ;;
+        *) echo "Invalid choice."; pause ;;
+      esac
+    fi
   done
 }
 
@@ -375,6 +398,15 @@ select_disk_flow() {
   if [[ ${#DISK_NAMES[@]} -eq 0 ]]; then
     echo "No disks found."
     pause
+    return 0
+  fi
+
+  # Only one disk: skip selection and operate on it directly.
+  if [[ ${#DISK_NAMES[@]} -eq 1 ]]; then
+    echo "Only one disk found: /dev/${DISK_NAMES[0]} (${DISK_SIZES[0]})"
+    echo "Opening disk operations (no selection needed)..."
+    sleep 1
+    disk_actions_menu "${DISK_NAMES[0]}" 1
     return 0
   fi
 
@@ -405,11 +437,12 @@ select_disk_flow() {
   fi
 
   idx=$((choice - 1))
-  disk_actions_menu "${DISK_NAMES[$idx]}"
+  disk_actions_menu "${DISK_NAMES[$idx]}" 0
 }
 
 # ---- submenu entry ----
 while true; do
+  load_disk_list
   clear
   echo "${BLD}${CYN}========================================${RST}"
   echo "${BLD}${CYN}   Disk / Drives${RST}"
@@ -418,7 +451,33 @@ while true; do
   echo "${YLW}WARNING: Format / delete partitions erases all data on that disk.${RST}"
   echo "${YLW}Do NOT choose the USB stick you booted from unless you mean to.${RST}"
   echo
-  echo "  1) Show all disk drives"
+
+  # Single disk: go straight to operations (show / format / wipe).
+  if [[ ${#DISK_NAMES[@]} -eq 1 ]]; then
+    echo "Only one disk detected: /dev/${DISK_NAMES[0]} (${DISK_SIZES[0]})"
+    echo "Skipping disk selection — opening operations on this disk."
+    echo
+    sleep 1
+    disk_actions_menu "${DISK_NAMES[0]}" 1
+    exit 0
+  fi
+
+  if [[ ${#DISK_NAMES[@]} -eq 0 ]]; then
+    echo "No disks found."
+    echo
+    echo "  1) Refresh"
+    echo "  2) Back to main menu"
+    echo
+    read -r -p "Choose option [1-2]: " main_choice
+    case "${main_choice}" in
+      1) continue ;;
+      2) exit 0 ;;
+      *) echo "Invalid choice."; pause ;;
+    esac
+    continue
+  fi
+
+  echo "  1) Show all disk drives (${#DISK_NAMES[@]} found)"
   echo "  2) Select a disk (partitions, format, wipe)"
   echo "  3) Back to main menu"
   echo
