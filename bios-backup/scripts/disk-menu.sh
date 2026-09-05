@@ -16,7 +16,7 @@ RST=$'\033[0m'
 
 pause() {
   echo
-  read -r -p "Press Enter to continue..." _
+  read -r -p "Press Enter to continue..." _ || true
 }
 
 # Returns 0 if DEV looks like it holds this live kit / current root disk.
@@ -353,7 +353,7 @@ disk_actions_menu() {
   disk_count=${#DISK_NAMES[@]}
 
   while true; do
-    clear
+    clear 2>/dev/null || true
     echo "${BLD}${CYN}========================================${RST}"
     if [[ "${only_one}" == "1" ]]; then
       echo "${BLD}${CYN}   Only disk: /dev/${name}${RST}"
@@ -372,7 +372,8 @@ disk_actions_menu() {
         echo "  4) Clone disk (pick source → destination)"
         echo "  5) Back to main menu"
         echo
-        read -r -p "Choose option [1-5]: " choice
+        read -r -p "Choose option [1-5]: " choice || true
+        [[ -z "${choice}" ]] && exit 0
         case "${choice}" in
           1) pause ;;
           2) format_disk "${name}"; pause ;;
@@ -384,7 +385,8 @@ disk_actions_menu() {
       else
         echo "  4) Back to main menu"
         echo
-        read -r -p "Choose option [1-4]: " choice
+        read -r -p "Choose option [1-4]: " choice || true
+        [[ -z "${choice}" ]] && exit 0
         case "${choice}" in
           1) pause ;;
           2) format_disk "${name}"; pause ;;
@@ -398,7 +400,8 @@ disk_actions_menu() {
       echo "  5) Select another disk"
       echo "  6) Back to main menu"
       echo
-      read -r -p "Choose option [1-6]: " choice
+      read -r -p "Choose option [1-6]: " choice || true
+      [[ -z "${choice}" ]] && exit 0
       case "${choice}" in
         1) pause ;;
         2) format_disk "${name}"; pause ;;
@@ -431,7 +434,7 @@ select_disk_flow() {
     return 0
   fi
 
-  clear
+  clear 2>/dev/null || true
   echo "${BLD}${CYN}========================================${RST}"
   echo "${BLD}${CYN}   Select a disk drive${RST}"
   echo "${BLD}${CYN}========================================${RST}"
@@ -446,7 +449,7 @@ select_disk_flow() {
   done
   echo "  ${i}) Back"
   echo
-  read -r -p "Choose disk: " choice
+  read -r -p "Choose disk: " choice || true
 
   if [[ "${choice}" == "${i}" ]]; then
     return 0
@@ -464,7 +467,7 @@ select_disk_flow() {
 # ---- submenu entry ----
 while true; do
   load_disk_list
-  clear
+  clear 2>/dev/null || true
   echo "${BLD}${CYN}========================================${RST}"
   echo "${BLD}${CYN}   Disk / Drives${RST}"
   echo "${BLD}${CYN}========================================${RST}"
@@ -489,7 +492,8 @@ while true; do
     echo "  1) Refresh"
     echo "  2) Back to main menu"
     echo
-    read -r -p "Choose option [1-2]: " main_choice
+    read -r -p "Choose option [1-2]: " main_choice || true
+    [[ -z "${main_choice}" ]] && exit 0
     case "${main_choice}" in
       1) continue ;;
       2) exit 0 ;;
@@ -501,14 +505,17 @@ while true; do
   echo "  1) Show all disk drives (${#DISK_NAMES[@]} found)"
   echo "  2) Select a disk (partitions, format, wipe)"
   echo "  3) Clone disk (source → destination, fast & accurate)"
-  echo "  4) Back to main menu"
+  echo "  4) Symantec Ghost 11 (.gho to USB / disk / network PC)"
+  echo "  5) Back to main menu"
   echo
-  read -r -p "Choose option [1-4]: " main_choice
+  read -r -p "Choose option [1-5]: " main_choice || true
+  [[ -z "${main_choice}" ]] && exit 0
   case "${main_choice}" in
-    1) clear; list_disks; pause ;;
+    1) clear 2>/dev/null || true; list_disks; pause ;;
     2) select_disk_flow ;;
     3) bash "${TOOL_DIR}/scripts/clone-disk.sh" ;;
-    4) exit 0 ;;
+    4) bash "${TOOL_DIR}/scripts/ghost-menu.sh" ;;
+    5) exit 0 ;;
     *) echo "Invalid choice."; pause ;;
   esac
 done

@@ -1,0 +1,83 @@
+OS COMPATIBILITY — XP / Windows 7 / Windows 10
+==============================================
+
+This pendrive is built to work on PCs that run Windows XP, Windows 7,
+or Windows 10. There are TWO ways to use it:
+
+A) BOOT from the USB (Linux live) — recommended for BIOS + disk tools
+B) Open the USB inside Windows (XP / 7 / 10) — for Symantec Ghost 11
+   and reading backups when Windows still starts
+
+---------------------------------------------------------------------
+VERIFIED OPTION MATRIX
+---------------------------------------------------------------------
+
+Option                         | Boot USB (Linux) | Inside XP | Inside Win7 | Inside Win10
+-------------------------------|------------------|-----------|-------------|-------------
+1 Copy BIOS                    | YES              | No*       | No*         | No*
+2 Upload BIOS                  | YES              | No*       | No*         | No*
+3 Show PC / chip info          | YES              | No*       | No*         | No*
+4 List BIOS backups            | YES              | YES**     | YES**       | YES**
+5 Disk list / format / wipe    | YES              | No*       | No*         | No*
+5 Disk clone (built-in)        | YES              | No*       | No*         | No*
+6 Ghost 11 + pick .gho dest    | YES***           | YES****   | YES****     | YES****
+6 Ghost dest = network PC disk | YES***           | YES****   | YES****     | YES****
+7 Network browse / file copy   | YES              | use Explorer / net use | same | same
+
+*  These need low-level chip / block access. They run from the Linux
+   live environment after you boot this USB — that works on machines
+   whose installed OS is XP, 7, or 10 (the installed Windows is not used).
+
+** Open the USB in Explorer and look in bios-backup\backups\
+
+*** From the Ventoy menu, boot a Ghost / DOS image if you placed one
+    (see ghost\README.txt). Or use option B inside Windows.
+
+**** Requires YOUR licensed Symantec Ghost 11 files in ghost\
+     (Ghost32.exe). Ghost 11 is old commercial software — this kit does
+     NOT include Ghost binaries (copyright). Win10: use Compatibility
+     mode (Windows XP SP3) if Ghost32 misbehaves.
+
+---------------------------------------------------------------------
+PENDRIVE FORMAT (important for XP)
+---------------------------------------------------------------------
+
+- Use Ventoy installed so the data partition is FAT32 if you need the
+  USB to open inside Windows XP Explorer.
+- Windows 7 / 10 can also read exFAT; XP cannot (without extra drivers).
+- Keep the "bios-backup" folder on that FAT32/exFAT data partition.
+
+---------------------------------------------------------------------
+HOW TO USE ON EACH OS
+---------------------------------------------------------------------
+
+### Any PC (XP / 7 / 10 installed) — BIOS, format, clone
+
+1. Boot this USB → start Linux live ISO (Ventoy)
+2. Terminal:
+     sudo bash /media/*/bios-backup/bios-menu.sh
+3. All menu options 1–5 work the same on all three machine types.
+
+### Windows XP / 7 / 10 still running — Ghost disk backup
+
+1. Plug USB into the running PC
+2. Open:
+     <USB>\bios-backup\windows\RUN-MENU.bat
+3. Choose Symantec Ghost 11 (after you copied your licensed files
+   into bios-backup\ghost\ — see ghost\README.txt)
+4. In Ghost: backup disk → image on this USB, another disk, or CD/DVD
+
+### Windows XP / 7 / 10 — only browse BIOS backups
+
+Open:
+  <USB>\bios-backup\backups\
+
+---------------------------------------------------------------------
+SUMMARY
+---------------------------------------------------------------------
+
+- One pendrive serves XP, Win7, and Win10 PCs.
+- Full BIOS + disk format/clone tools: boot Linux from the USB
+  (works regardless of which Windows is installed).
+- Ghost disk-to-USB / CD / other-disk backup: run from Windows
+  (or boot Ghost) after you place your licensed Ghost 11 files.

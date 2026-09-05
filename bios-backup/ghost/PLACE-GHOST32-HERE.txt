@@ -1,0 +1,2 @@
+# Placeholder — put licensed Ghost32.exe and related Ghost 11 files in this folder.
+# See README.txt

@@ -1,91 +1,100 @@
-# BIOS Copy / Upload — Bootable USB Kit
+# BIOS + Disk USB Kit
 
-Bootable-pendrive toolkit with a simple menu:
+Pendrive toolkit for **Windows XP, Windows 7, and Windows 10** PCs:
 
-1. **Copy BIOS** — dump this PC’s firmware to the USB  
-2. **Upload BIOS** — restore a previous dump if firmware is damaged  
-3. **Disk / Drives** — list disks, select one, show partitions & free space, format, or wipe all partitions  
+1. **Copy / Upload BIOS** (boot Linux from USB)  
+2. **Disk tools** — list, format, wipe, fast clone  
+3. **Symantec Ghost 11** — disk backup to USB / CD / other disk (your licensed Ghost files)
 
-Designed for older PCs (including Windows 7 machines) where you boot Linux from USB, then run the menu. Does not modify Windows itself.
+See **[OS-COMPAT.txt](OS-COMPAT.txt)** for the verified XP / 7 / 10 matrix.
 
 ## Quick start
 
-1. Read **[START-HERE.txt](START-HERE.txt)** and **[BOOT-USB.md](BOOT-USB.md)**  
-2. Create a Ventoy (or Rufus) bootable USB with a Linux live ISO  
-3. Install this kit onto the USB:
+1. Read **[START-HERE.txt](START-HERE.txt)**, **[BOOT-USB.md](BOOT-USB.md)**, **[OS-COMPAT.txt](OS-COMPAT.txt)**  
+2. Create a Ventoy USB (**FAT32** data partition if XP must open the stick in Explorer)  
+3. Copy a Linux live ISO onto Ventoy  
+4. Install this kit:
 
    ```bash
    chmod +x prepare-usb.sh bios-menu.sh scripts/*.sh
    sudo ./prepare-usb.sh /path/to/mounted/usb
    ```
 
-4. Boot the target PC from the pendrive → open Terminal → run:
+5. Optional — Ghost 11: copy **your licensed** `Ghost32.exe` (+ files) into `bios-backup/ghost/`  
+   (Ghost is **not** included — proprietary; see `ghost/README.txt`)
 
-   ```bash
-   sudo bash /path/to/usb/bios-backup/bios-menu.sh
-   ```
+### Boot Linux (BIOS + disk tools — works on XP / 7 / 10 machines)
 
-5. Choose **Copy**, **Upload**, or **Disk / Drives**
+```bash
+sudo bash /path/to/usb/bios-backup/bios-menu.sh
+```
 
-## Menu options
+### Inside Windows XP / 7 / 10 (Ghost + browse backups)
+
+Run: `bios-backup\windows\RUN-MENU.bat`
+
+## Menu options (Linux boot)
 
 | Option | Action |
 | --- | --- |
-| 1 Copy BIOS | `flashrom` read → `backups/<timestamp>_…/bios.bin` |
-| 2 Upload BIOS | Pick a `bios.bin` → `flashrom` write (type `YES` to confirm) |
+| 1 Copy BIOS | `flashrom` read → `backups/…/bios.bin` |
+| 2 Upload BIOS | Restore `bios.bin` (type `YES`) |
 | 3 Show info | SMBIOS + chip probe |
 | 4 List backups | Show dumps on the USB |
-| 5 Disk / Drives | List / format / wipe / **clone** disks (fast & accurate) |
-| 6 Exit | Quit |
+| 5 Disk / Drives | Format / wipe / **clone** |
+| 6 Symantec Ghost 11 | Show disks → connect **network PC** storage → **select** .gho destination → run Ghost |
+| 7 Network & Transfer | Browse other PCs (SMB), copy to/from shares / CD / USB / local disks |
+| 8 Exit | Quit |
 
-### Disk / Drives submenu
+### Ghost image destination (local or network)
 
-- **One disk only:** skips selection and opens format / wipe / partition view on that disk directly  
-- **Multiple disks:**
+Linux menu **6** or Windows `choose-ghost-dest.bat`:
 
-  1. Show all disk drives  
-  2. Select a disk → partitions & space / format / wipe  
-  3. **Clone disk** (fast & accurate):
+1. **Show available disks** on this PC (size / free space)  
+2. **Connect network PC storage** (SMB share)  
+3. **Select destination** from the list (USB, local disk, CD mount, or network share)  
+4. In Ghost: Local → Disk → To Image → save `.gho` into that folder  
 
-     - Select **source** disk → shows all partitions and free/used space  
-     - Confirm source  
-     - Select **destination** disk → shows its partitions & space  
-     - Type destination name + `YES` → large-block bit-accurate copy (`dd` 64 MiB, direct I/O, `pv` progress when available)  
-     - Quick head/tail verify after clone  
+### Clone (built-in)
 
-Destructive steps ask you to type the disk name (e.g. `sda`) and `YES`. Destination must be **at least as large** as the source.
+- Same size → same-space bit copy (128 MiB `dd`, direct I/O, verify)  
+- Source larger → proportionate partitions to fit  
+- Source smaller → ask same-space **or** proportionate  
+
+### Ghost 11 (licensed copy you provide)
+
+- **Windows:** `windows\RUN-MENU.bat` → Ghost → Disk to Image (USB/CD/other disk) or Disk to Disk  
+- **Win10:** set Ghost32.exe compatibility to Windows XP SP3 if needed  
 
 ## Layout
 
 ```text
 bios-backup/
-  bios-menu.sh       ← main menu (run as root)
-  prepare-usb.sh     ← copy kit onto a mounted pendrive
+  bios-menu.sh
+  prepare-usb.sh
   START-HERE.txt
   BOOT-USB.md
+  OS-COMPAT.txt
+  windows/
+    RUN-MENU.bat
+    choose-ghost-dest.bat   ← pick local disk or \\network\share for .gho
+    run-ghost.bat
+  ghost/
+    README.txt          ← put Ghost32.exe here (your license)
   scripts/
-    copy-bios.sh
-    upload-bios.sh
-    show-info.sh
-    list-backups.sh
-    disk-menu.sh
-    clone-disk.sh
-    lib.sh
-  backups/           ← created on the USB; holds bios.bin dumps
+    copy-bios.sh, upload-bios.sh, show-info.sh, list-backups.sh
+    disk-menu.sh, clone-disk.sh, ghost-menu.sh, network-menu.sh, lib.sh
+  backups/
+    ghost-images/       ← default .gho folder + SELECTED-DEST.txt
 ```
-
-## Requirements
-
-- Bootable Linux live environment with root access  
-- [`flashrom`](https://flashrom.org/) (preinstalled on many rescue ISOs; else `apt install flashrom`)  
-- Internal SPI flash readable/writable on that motherboard (some vendors lock this)
 
 ## Limits
 
-- If the board does **not POST at all**, this USB menu cannot talk to the chip — use Dual-BIOS, the vendor’s emergency USB recovery, or a hardware programmer.  
-- **Upload** only a dump from the **same** motherboard. Wrong firmware can brick the PC.  
-- This kit does not bypass Secure Boot, TPM, or vendor locks, and does not patch firmware.
+- Full BIOS flash / format / clone need **booting** the Linux live USB (not from inside Windows).  
+- That boot path works the same on PCs whose installed OS is XP, 7, or 10.  
+- Ghost binaries are not redistributed.  
+- Dead board with no POST: Dual-BIOS / vendor recovery / SPI programmer.
 
-## Legal / intended use
+## Legal
 
-For backing up and restoring firmware on computers you own or are authorized to service. Keep dumps private (they may include serials and vendor IP).
+For machines you own or are authorized to service. Use only Ghost software you are licensed to use. Keep firmware dumps private.

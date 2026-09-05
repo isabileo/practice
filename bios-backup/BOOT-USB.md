@@ -1,67 +1,73 @@
-# Make a bootable pendrive with Copy / Upload BIOS menu
+# Make a bootable pendrive (XP / Windows 7 / Windows 10)
 
-You need a USB stick (4 GB+). The BIOS menu runs **after you boot Linux from the stick** — it does not run inside Windows 7.
+One USB works on all three PC types. See **OS-COMPAT.txt**.
+
+The BIOS / format / wipe / clone tools run after you **boot Linux** from the stick  
+(they are not Windows programs). Ghost 11 runs from **Windows** (or a Ghost boot ISO)
+after you place your licensed Ghost files on the stick.
 
 ## Option A — Ventoy (recommended)
 
-1. On any working PC, download [Ventoy](https://www.ventoy.net/) and install it to the pendrive.
-2. Copy a Linux live ISO onto the Ventoy USB, for example:
-   - [SystemRescue](https://www.system-rescue.org/) (includes many recovery tools), or
-   - Ubuntu Desktop LTS ISO
-3. From this project, copy the kit onto the USB:
+1. Install [Ventoy](https://www.ventoy.net/) on the pendrive.  
+   - Prefer **FAT32** for the data partition if **Windows XP** must open the USB in Explorer.  
+   - Win7 / Win10 can also use exFAT.
+2. Copy a Linux live ISO onto the Ventoy USB (SystemRescue or Ubuntu LTS).
+3. Install this kit:
 
    ```bash
    sudo ./prepare-usb.sh /path/to/mounted/VentoyUSB
    ```
 
-   Or manually copy the whole `bios-backup` folder to the USB root.
-4. Plug the pendrive into the Windows 7 PC.
-5. Power on → open the one-time boot menu (often **F12**, **F10**, **Esc**, or **F9**) → boot the USB.
-6. In Ventoy, start the Linux ISO.
-7. Open a terminal:
+4. Optional: copy your licensed **Symantec Ghost 11** files into:
 
-   ```bash
-   # Find the USB (example)
-   ls /media
-   sudo bash /media/$(whoami)/*/bios-backup/bios-menu.sh
+   ```text
+   bios-backup/ghost/Ghost32.exe   (+ DLLs / support files)
    ```
 
-8. Menu:
+   See `ghost/README.txt`. Ghost is **not** shipped with this kit.
 
-   - **1) Copy BIOS** — saves `bios.bin` onto the pendrive under `bios-backup/backups/`
-   - **2) Upload BIOS** — flashes a saved `bios.bin` back to the chip
-   - **5) Disk / Drives** — list disks, select one, show partitions & free space, format, delete all partitions, or **clone** source → destination
+5. Use:
 
-If `flashrom` is missing (Ubuntu live):
+   | Goal | What to do |
+   | --- | --- |
+   | BIOS copy/upload, format, wipe, clone | Boot USB → Linux → `sudo bash …/bios-menu.sh` |
+   | Ghost disk → USB / CD / other disk | In XP/7/10: `bios-backup\windows\RUN-MENU.bat` |
+
+6. Linux menu highlights:
+
+   - **1–2)** Copy / Upload BIOS  
+   - **5)** Disk / Drives (format, wipe, clone)  
+   - **6)** Symantec Ghost 11 helper  
+
+If `flashrom` is missing on Ubuntu live:
 
 ```bash
 sudo apt update && sudo apt install -y flashrom
 ```
 
-For NTFS format support on the live system:
+NTFS format support:
 
 ```bash
 sudo apt install -y ntfs-3g
 ```
 
-## Option B — Rufus (from Windows)
+## Option B — Rufus
 
-1. On a working Windows PC, run [Rufus](https://rufus.ie/).
-2. Select the pendrive + a Linux ISO (Ubuntu or SystemRescue) → Write in **ISO mode**.
-3. After writing, copy the `bios-backup` folder onto the USB data area if the stick still mounts; with some ISOs you may need a second small FAT32 stick for backups, or use Ventoy instead (easier for keeping files).
-4. Boot the target PC from the USB and run `bios-menu.sh` as above.
+1. Run [Rufus](https://rufus.ie/) → Linux ISO → write USB.  
+2. Copy `bios-backup` onto the stick if it still mounts (Ventoy is easier for keeping files).  
+3. Boot Linux for BIOS/disk tools; use `windows\RUN-MENU.bat` for Ghost under Windows.
 
-## When BIOS has “crashed”
+## When BIOS has crashed
 
-| Situation | What to do |
+| Situation | Action |
 | --- | --- |
-| PC shows logo / beep but Windows won’t start | Boot this USB → **Upload BIOS** with a dump from this board |
-| PC still runs Windows sometimes | Boot USB anyway → **Copy BIOS** first while it works |
-| No display, no fans pattern, fully dead | USB cannot flash it — Dual-BIOS switch, vendor recovery pad, or SPI programmer |
+| Logo/beep but Windows won’t start | Boot USB → Upload BIOS |
+| Windows still runs sometimes | Boot USB → Copy BIOS first |
+| Fully dead (no POST) | Dual-BIOS / vendor pad / SPI programmer |
 
 ## Safety
 
-- Own / administer the PC.
-- Restore only images dumped from the **same** board.
-- Do not cut power during **Upload**.
-- Keep the pendrive with the backup in a safe place.
+- Own / administer the PC.  
+- Restore only dumps from the **same** board.  
+- Use only licensed Ghost software.  
+- Do not pick the wrong disk for format / clone / Ghost.

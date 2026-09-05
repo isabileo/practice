@@ -33,11 +33,11 @@ need_root() {
 
 pause() {
   echo
-  read -r -p "Press Enter to continue..." _
+  read -r -p "Press Enter to continue..." _ || true
 }
 
 show_header() {
-  clear
+  clear 2>/dev/null || true
   echo "${BLD}${CYN}========================================${RST}"
   echo "${BLD}${CYN}   BIOS + Disk USB Boot Kit${RST}"
   echo "${BLD}${CYN}========================================${RST}"
@@ -51,21 +51,28 @@ show_header() {
 
 show_menu() {
   show_header
-  echo "  1) Copy BIOS     — save a backup of this PC's firmware"
-  echo "  2) Upload BIOS   — restore a previous backup to this PC"
+  echo "  1) Copy BIOS            — save a backup of this PC's firmware"
+  echo "  2) Upload BIOS          — restore a previous backup to this PC"
   echo "  3) Show PC / chip info"
   echo "  4) List saved backups"
-  echo "  5) Disk / Drives  — list, format, wipe, clone disks"
-  echo "  6) Exit"
+  echo "  5) Disk / Drives        — list, format, wipe, clone disks"
+  echo "  6) Symantec Ghost 11    — .gho to USB / disk / network PC"
+  echo "  7) Network & Transfer   — other PCs, copy to/from shares / CD / USB"
+  echo "  8) Exit"
   echo
-  read -r -p "Choose option [1-6]: " choice
+  echo "Note: This kit does not bypass or remove BIOS passwords."
+  echo
+  read -r -p "Choose option [1-8]: " choice || true
+  [[ -z "${choice}" ]] && exit 0
   case "${choice}" in
     1) bash "${SCRIPT_DIR}/scripts/copy-bios.sh"; pause ;;
     2) bash "${SCRIPT_DIR}/scripts/upload-bios.sh"; pause ;;
     3) bash "${SCRIPT_DIR}/scripts/show-info.sh"; pause ;;
     4) bash "${SCRIPT_DIR}/scripts/list-backups.sh"; pause ;;
     5) bash "${SCRIPT_DIR}/scripts/disk-menu.sh" ;;
-    6) echo "Bye."; exit 0 ;;
+    6) bash "${SCRIPT_DIR}/scripts/ghost-menu.sh" ;;
+    7) bash "${SCRIPT_DIR}/scripts/network-menu.sh" ;;
+    8) echo "Bye."; exit 0 ;;
     *) echo "Invalid choice."; pause ;;
   esac
 }

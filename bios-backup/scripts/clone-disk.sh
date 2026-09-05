@@ -29,7 +29,7 @@ DD_BS="128M" # large blocks = higher throughput on modern disks
 
 pause() {
   echo
-  read -r -p "Press Enter to continue..." _
+  read -r -p "Press Enter to continue..." _ || true
 }
 
 DISK_NAMES=()
@@ -166,7 +166,7 @@ pick_disk() {
   done
   echo "  ${i}) Cancel"
   echo
-  read -r -p "Choose: " choice
+  read -r -p "Choose: " choice || true
 
   if [[ "${choice}" == "${i}" ]]; then
     PICKED_NAME=""
@@ -569,7 +569,7 @@ choose_clone_mode() {
   echo "  2) Proportionate  — scale partitions to fill the whole destination"
   echo "  3) Cancel"
   echo
-  read -r -p "Choose [1-3]: " style
+  read -r -p "Choose [1-3]: " style || true
   case "${style}" in
     1) CLONE_MODE="same" ;;
     2) CLONE_MODE="proportionate" ;;
@@ -579,7 +579,7 @@ choose_clone_mode() {
 }
 
 # ---- main ----
-clear
+clear 2>/dev/null || true
 echo "${BLD}${CYN}========================================${RST}"
 echo "${BLD}${CYN}   Clone Disk (fast & accurate)${RST}"
 echo "${BLD}${CYN}========================================${RST}"
@@ -616,7 +616,7 @@ if ! pick_disk "Select SOURCE disk (data to copy FROM):"; then
 fi
 SRC_NAME="${PICKED_NAME}"
 
-clear
+clear 2>/dev/null || true
 echo "${BLD}${CYN}========================================${RST}"
 echo "${BLD}${CYN}   Source disk details${RST}"
 echo "${BLD}${CYN}========================================${RST}"
@@ -629,7 +629,7 @@ if [[ ! "${ok}" =~ ^[Yy]$ ]]; then
   exit 0
 fi
 
-clear
+clear 2>/dev/null || true
 echo "${BLD}${CYN}========================================${RST}"
 echo "${BLD}${CYN}   Select DESTINATION disk${RST}"
 echo "${BLD}${CYN}========================================${RST}"
@@ -644,7 +644,7 @@ if ! pick_disk "Select DESTINATION disk (will be overwritten):" "${SRC_NAME}"; t
 fi
 DST_NAME="${PICKED_NAME}"
 
-clear
+clear 2>/dev/null || true
 echo "${BLD}${CYN}========================================${RST}"
 echo "${BLD}${CYN}   Destination disk details${RST}"
 echo "${BLD}${CYN}========================================${RST}"
