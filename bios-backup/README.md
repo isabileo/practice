@@ -35,7 +35,7 @@ Designed for older PCs (including Windows 7 machines) where you boot Linux from 
 | 2 Upload BIOS | Pick a `bios.bin` → `flashrom` write (type `YES` to confirm) |
 | 3 Show info | SMBIOS + chip probe |
 | 4 List backups | Show dumps on the USB |
-| 5 Disk / Drives | List disks → select → partitions & space → format or wipe partitions |
+| 5 Disk / Drives | List / format / wipe / **clone** disks (fast & accurate) |
 | 6 Exit | Quit |
 
 ### Disk / Drives submenu
@@ -44,14 +44,16 @@ Designed for older PCs (including Windows 7 machines) where you boot Linux from 
 - **Multiple disks:**
 
   1. Show all disk drives  
-  2. Select a disk → then:
+  2. Select a disk → partitions & space / format / wipe  
+  3. **Clone disk** (fast & accurate):
 
-     - Refresh partitions & available space  
-     - **Format** this disk (GPT + one partition: NTFS / FAT32 / exFAT / ext4)  
-     - **Delete all partitions** (empty disk, no partitions)  
-     - Select another disk / back to main menu  
+     - Select **source** disk → shows all partitions and free/used space  
+     - Confirm source  
+     - Select **destination** disk → shows its partitions & space  
+     - Type destination name + `YES` → large-block bit-accurate copy (`dd` 64 MiB, direct I/O, `pv` progress when available)  
+     - Quick head/tail verify after clone  
 
-Destructive steps ask you to type the disk name (e.g. `sda`) and `YES`.
+Destructive steps ask you to type the disk name (e.g. `sda`) and `YES`. Destination must be **at least as large** as the source.
 
 ## Layout
 
@@ -67,6 +69,7 @@ bios-backup/
     show-info.sh
     list-backups.sh
     disk-menu.sh
+    clone-disk.sh
     lib.sh
   backups/           ← created on the USB; holds bios.bin dumps
 ```

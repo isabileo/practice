@@ -347,6 +347,10 @@ disk_actions_menu() {
   local name="$1"
   local only_one="${2:-0}"
   local choice
+  local disk_count=0
+
+  load_disk_list
+  disk_count=${#DISK_NAMES[@]}
 
   while true; do
     clear
@@ -364,27 +368,44 @@ disk_actions_menu() {
     echo "  2) Format this disk (wipe + one new partition)"
     echo "  3) Delete all partitions (make disk with no partitions)"
     if [[ "${only_one}" == "1" ]]; then
-      echo "  4) Back to main menu"
-      echo
-      read -r -p "Choose option [1-4]: " choice
-      case "${choice}" in
-        1) pause ;;
-        2) format_disk "${name}"; pause ;;
-        3) wipe_partitions_only "${name}"; pause ;;
-        4) exit 0 ;;
-        *) echo "Invalid choice."; pause ;;
-      esac
+      if ((disk_count >= 2)); then
+        echo "  4) Clone disk (pick source → destination)"
+        echo "  5) Back to main menu"
+        echo
+        read -r -p "Choose option [1-5]: " choice
+        case "${choice}" in
+          1) pause ;;
+          2) format_disk "${name}"; pause ;;
+          3) wipe_partitions_only "${name}"; pause ;;
+          4) bash "${TOOL_DIR}/scripts/clone-disk.sh" ;;
+          5) exit 0 ;;
+          *) echo "Invalid choice."; pause ;;
+        esac
+      else
+        echo "  4) Back to main menu"
+        echo
+        read -r -p "Choose option [1-4]: " choice
+        case "${choice}" in
+          1) pause ;;
+          2) format_disk "${name}"; pause ;;
+          3) wipe_partitions_only "${name}"; pause ;;
+          4) exit 0 ;;
+          *) echo "Invalid choice."; pause ;;
+        esac
+      fi
     else
-      echo "  4) Select another disk"
-      echo "  5) Back to main menu"
+      echo "  4) Clone disk (pick source → destination)"
+      echo "  5) Select another disk"
+      echo "  6) Back to main menu"
       echo
-      read -r -p "Choose option [1-5]: " choice
+      read -r -p "Choose option [1-6]: " choice
       case "${choice}" in
         1) pause ;;
         2) format_disk "${name}"; pause ;;
         3) wipe_partitions_only "${name}"; pause ;;
-        4) return 0 ;;
-        5) exit 0 ;;
+        4) bash "${TOOL_DIR}/scripts/clone-disk.sh" ;;
+        5) return 0 ;;
+        6) exit 0 ;;
         *) echo "Invalid choice."; pause ;;
       esac
     fi
@@ -479,13 +500,15 @@ while true; do
 
   echo "  1) Show all disk drives (${#DISK_NAMES[@]} found)"
   echo "  2) Select a disk (partitions, format, wipe)"
-  echo "  3) Back to main menu"
+  echo "  3) Clone disk (source → destination, fast & accurate)"
+  echo "  4) Back to main menu"
   echo
-  read -r -p "Choose option [1-3]: " main_choice
+  read -r -p "Choose option [1-4]: " main_choice
   case "${main_choice}" in
     1) clear; list_disks; pause ;;
     2) select_disk_flow ;;
-    3) exit 0 ;;
+    3) bash "${TOOL_DIR}/scripts/clone-disk.sh" ;;
+    4) exit 0 ;;
     *) echo "Invalid choice."; pause ;;
   esac
 done

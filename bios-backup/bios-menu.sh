@@ -55,7 +55,7 @@ show_menu() {
   echo "  2) Upload BIOS   — restore a previous backup to this PC"
   echo "  3) Show PC / chip info"
   echo "  4) List saved backups"
-  echo "  5) Disk / Drives  — list disks, partitions, format, wipe"
+  echo "  5) Disk / Drives  — list, format, wipe, clone disks"
   echo "  6) Exit"
   echo
   read -r -p "Choose option [1-6]: " choice
