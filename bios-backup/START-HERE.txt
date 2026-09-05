@@ -1,7 +1,23 @@
 BIOS + DISK USB KIT — XP / Windows 7 / Windows 10
 =================================================
 
-ONE pendrive for all three OS types. See OS-COMPAT.txt.
+ONE FILE for Ventoy / Rufus (easiest)
+-------------------------------------
+Copy this single file onto your bootable USB:
+
+  dist/BIOS-USB-KIT.sh
+
+Then boot Linux from the USB and run:
+
+  bash BIOS-USB-KIT.sh
+  sudo bash bios-backup/bios-menu.sh
+
+(See dist/README.txt for Ventoy + Rufus steps.)
+Optional zip: dist/BIOS-USB-KIT.zip
+
+FULL FOLDER (same tools)
+------------------------
+Or copy the whole bios-backup/ folder with prepare-usb.sh.
 
 MAIN MENU (boot Linux from this USB)
   1) Copy BIOS
@@ -9,29 +25,22 @@ MAIN MENU (boot Linux from this USB)
   3) Show PC / chip info
   4) List saved backups
   5) Disk / Drives — list, format, wipe, clone
-  6) Symantec Ghost 11 — store .gho on USB / local disk / NETWORK PC
-       → Show available disks
-       → Connect network PC storage
-       → Select destination (list + pick)
-  7) Network & Transfer — see other PCs, copy to/from shares / CD / USB
+  6) Symantec Ghost 11 — .gho to USB / local disk / NETWORK PC
+  7) Network & Transfer — other PCs, copy to/from shares / CD / USB
   8) Exit
+
+This kit does NOT bypass or remove BIOS passwords.
 
 WINDOWS MENU (XP / 7 / 10 still running)
   Open: bios-backup\windows\RUN-MENU.bat
-    1) Choose Ghost image destination (shows disks; local or \\network\share)
-    2) Run Ghost 11 (after placing licensed Ghost32.exe in ghost\)
-    3) Browse BIOS backups
-
-GHOST IMAGE ON NETWORK PC
-  Linux:  menu 6 → Connect network PC storage → Select destination
-  Windows: RUN-MENU → Choose Ghost destination → Network PC storage
-  Then in Ghost: Local → Disk → To Image → save into that folder
 
 BUILD PENDRIVE
   1. Ventoy on USB (FAT32 data if XP must read the stick)
   2. Copy a Linux live ISO onto the USB
-  3. sudo ./prepare-usb.sh /path/to/usb
-  4. Optional: copy YOUR licensed Ghost32.exe into bios-backup\ghost\
+  3. Copy dist/BIOS-USB-KIT.sh onto the USB
+     (or: sudo ./prepare-usb.sh /path/to/usb)
+  4. Boot Linux → bash BIOS-USB-KIT.sh → sudo bash bios-backup/bios-menu.sh
+  5. Optional: licensed Ghost32.exe into bios-backup\ghost\
 
 IMPORTANT
   - Ghost is NOT included (copyright) — use only software you license.

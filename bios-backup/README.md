@@ -8,7 +8,25 @@ Pendrive toolkit for **Windows XP, Windows 7, and Windows 10** PCs:
 
 See **[OS-COMPAT.txt](OS-COMPAT.txt)** for the verified XP / 7 / 10 matrix.
 
-## Quick start
+## Single file for Ventoy / Rufus
+
+Copy **one file** onto the USB:
+
+| File | Use |
+| --- | --- |
+| [`dist/BIOS-USB-KIT.sh`](dist/BIOS-USB-KIT.sh) | Self-extracting (recommended) |
+| [`dist/BIOS-USB-KIT.zip`](dist/BIOS-USB-KIT.zip) | Extract with Windows Explorer |
+
+```bash
+# On the bootable USB (after booting Linux):
+bash BIOS-USB-KIT.sh
+sudo bash bios-backup/bios-menu.sh
+```
+
+Rebuild after edits: `bash build-single-file.sh`  
+Details: [`dist/README.txt`](dist/README.txt)
+
+## Quick start (full folder)
 
 1. Read **[START-HERE.txt](START-HERE.txt)**, **[BOOT-USB.md](BOOT-USB.md)**, **[OS-COMPAT.txt](OS-COMPAT.txt)**  
 2. Create a Ventoy USB (**FAT32** data partition if XP must open the stick in Explorer)  

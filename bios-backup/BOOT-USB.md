@@ -12,10 +12,23 @@ after you place your licensed Ghost files on the stick.
    - Prefer **FAT32** for the data partition if **Windows XP** must open the USB in Explorer.  
    - Win7 / Win10 can also use exFAT.
 2. Copy a Linux live ISO onto the Ventoy USB (SystemRescue or Ubuntu LTS).
-3. Install this kit:
+3. Copy **one file** onto the same USB:
+
+   ```text
+   dist/BIOS-USB-KIT.sh
+   ```
+
+   Or install the folder kit:
 
    ```bash
    sudo ./prepare-usb.sh /path/to/mounted/VentoyUSB
+   ```
+
+4. Boot Linux from Ventoy → Terminal:
+
+   ```bash
+   bash /media/*/BIOS-USB-KIT.sh          # once, extracts bios-backup/
+   sudo bash /media/*/bios-backup/bios-menu.sh
    ```
 
 4. Optional: copy your licensed **Symantec Ghost 11** files into:
