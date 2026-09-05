@@ -40,13 +40,16 @@ Designed for older PCs (including Windows 7 machines) where you boot Linux from 
 
 ### Disk / Drives submenu
 
-1. Show all disk drives  
-2. Select a disk → then:
+- **One disk only:** skips selection and opens format / wipe / partition view on that disk directly  
+- **Multiple disks:**
 
-   - Refresh partitions & available space  
-   - **Format** this disk (GPT + one partition: NTFS / FAT32 / exFAT / ext4)  
-   - **Delete all partitions** (empty disk, no partitions)  
-   - Select another disk / back to main menu  
+  1. Show all disk drives  
+  2. Select a disk → then:
+
+     - Refresh partitions & available space  
+     - **Format** this disk (GPT + one partition: NTFS / FAT32 / exFAT / ext4)  
+     - **Delete all partitions** (empty disk, no partitions)  
+     - Select another disk / back to main menu  
 
 Destructive steps ask you to type the disk name (e.g. `sda`) and `YES`.
 
