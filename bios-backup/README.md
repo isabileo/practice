@@ -4,6 +4,7 @@ Bootable-pendrive toolkit with a simple menu:
 
 1. **Copy BIOS** — dump this PC’s firmware to the USB  
 2. **Upload BIOS** — restore a previous dump if firmware is damaged  
+3. **Disk / Drives** — list disks, select one, show partitions & free space, format, or wipe all partitions  
 
 Designed for older PCs (including Windows 7 machines) where you boot Linux from USB, then run the menu. Does not modify Windows itself.
 
@@ -24,7 +25,7 @@ Designed for older PCs (including Windows 7 machines) where you boot Linux from 
    sudo bash /path/to/usb/bios-backup/bios-menu.sh
    ```
 
-5. Choose **Copy** (backup now) or **Upload** (restore later)
+5. Choose **Copy**, **Upload**, or **Disk / Drives**
 
 ## Menu options
 
@@ -34,7 +35,20 @@ Designed for older PCs (including Windows 7 machines) where you boot Linux from 
 | 2 Upload BIOS | Pick a `bios.bin` → `flashrom` write (type `YES` to confirm) |
 | 3 Show info | SMBIOS + chip probe |
 | 4 List backups | Show dumps on the USB |
-| 5 Exit | Quit |
+| 5 Disk / Drives | List disks → select → partitions & space → format or wipe partitions |
+| 6 Exit | Quit |
+
+### Disk / Drives submenu
+
+1. Show all disk drives  
+2. Select a disk → then:
+
+   - Refresh partitions & available space  
+   - **Format** this disk (GPT + one partition: NTFS / FAT32 / exFAT / ext4)  
+   - **Delete all partitions** (empty disk, no partitions)  
+   - Select another disk / back to main menu  
+
+Destructive steps ask you to type the disk name (e.g. `sda`) and `YES`.
 
 ## Layout
 
@@ -49,6 +63,7 @@ bios-backup/
     upload-bios.sh
     show-info.sh
     list-backups.sh
+    disk-menu.sh
     lib.sh
   backups/           ← created on the USB; holds bios.bin dumps
 ```

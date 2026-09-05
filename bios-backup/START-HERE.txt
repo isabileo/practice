@@ -2,8 +2,10 @@ BIOS COPY / UPLOAD — USB BOOT KIT
 =================================
 
 What you get when you boot:
-  1) Copy BIOS    — save firmware from this PC onto the pendrive
-  2) Upload BIOS  — write a saved backup back (if BIOS is damaged but PC still POSTs)
+  1) Copy BIOS     — save firmware from this PC onto the pendrive
+  2) Upload BIOS   — write a saved backup back (if BIOS is damaged but PC still POSTs)
+  5) Disk / Drives  — show disks, select one, see partitions & free space,
+                      format the disk, or delete all partitions (empty disk)
 
 How to use (short):
   1. Create a bootable Linux USB (Ventoy or Rufus) — see BOOT-USB.md
@@ -15,7 +17,11 @@ How to use (short):
 
      (path may differ — find the USB and use that path)
 
-  5. Pick Copy or Upload from the menu
+  5. Pick Copy, Upload, or Disk / Drives from the menu
+
+Disk / Drives flow:
+  Show drives → Select disk → see partitions & space →
+    Format disk  OR  Delete all partitions (no partitions) → back to main menu
 
 IMPORTANT:
   - Copy a good BIOS NOW, before it crashes.
@@ -23,3 +29,4 @@ IMPORTANT:
   - If the PC has NO power-on / NO logo at all, a USB tool cannot help —
     use Dual-BIOS, vendor USB recovery, or a hardware SPI programmer.
   - Wrong upload can brick the board permanently.
+  - Format / wipe erases ALL data on the selected disk — do not pick your boot USB.

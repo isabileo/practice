@@ -30,11 +30,18 @@ You need a USB stick (4 GB+). The BIOS menu runs **after you boot Linux from the
 
    - **1) Copy BIOS** — saves `bios.bin` onto the pendrive under `bios-backup/backups/`
    - **2) Upload BIOS** — flashes a saved `bios.bin` back to the chip
+   - **5) Disk / Drives** — list disks, select one, show partitions & free space, format, or delete all partitions
 
 If `flashrom` is missing (Ubuntu live):
 
 ```bash
 sudo apt update && sudo apt install -y flashrom
+```
+
+For NTFS format support on the live system:
+
+```bash
+sudo apt install -y ntfs-3g
 ```
 
 ## Option B — Rufus (from Windows)
