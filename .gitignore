@@ -16,3 +16,9 @@ xcuserdata/
 # SwiftPM
 .build/
 .swiftpm/
+
+# Node / CUT video editor
+node_modules/
+dist/
+*.local
+.DS_Store
