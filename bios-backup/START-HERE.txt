@@ -1,0 +1,48 @@
+BIOS + DISK USB KIT — XP / Windows 7 / Windows 10
+=================================================
+
+ONE FILE for Ventoy / Rufus (easiest)
+-------------------------------------
+Copy this single file onto your bootable USB:
+
+  dist/BIOS-USB-KIT.sh
+
+Then boot Linux from the USB and run:
+
+  bash BIOS-USB-KIT.sh
+  sudo bash bios-backup/bios-menu.sh
+
+(See dist/README.txt for Ventoy + Rufus steps.)
+Optional zip: dist/BIOS-USB-KIT.zip
+
+FULL FOLDER (same tools)
+------------------------
+Or copy the whole bios-backup/ folder with prepare-usb.sh.
+
+MAIN MENU (boot Linux from this USB)
+  1) Copy BIOS
+  2) Upload BIOS
+  3) Show PC / chip info
+  4) List saved backups
+  5) Disk / Drives — list, format, wipe, clone
+  6) Symantec Ghost 11 — .gho to USB / local disk / NETWORK PC
+  7) Network & Transfer — other PCs, copy to/from shares / CD / USB
+  8) Exit
+
+This kit does NOT bypass or remove BIOS passwords.
+
+WINDOWS MENU (XP / 7 / 10 still running)
+  Open: bios-backup\windows\RUN-MENU.bat
+
+BUILD PENDRIVE
+  1. Ventoy on USB (FAT32 data if XP must read the stick)
+  2. Copy a Linux live ISO onto the USB
+  3. Copy dist/BIOS-USB-KIT.sh onto the USB
+     (or: sudo ./prepare-usb.sh /path/to/usb)
+  4. Boot Linux → bash BIOS-USB-KIT.sh → sudo bash bios-backup/bios-menu.sh
+  5. Optional: licensed Ghost32.exe into bios-backup\ghost\
+
+IMPORTANT
+  - Ghost is NOT included (copyright) — use only software you license.
+  - Network access needs share permissions on the other PC.
+  - Format / wipe / clone / Ghost overwrite destroy data — pick carefully.
