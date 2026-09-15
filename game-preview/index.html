@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+  <title>Sparklane — iOS Game Preview</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main class="stage">
+    <div class="phone" aria-label="iPhone game preview">
+      <div class="phone-bezel">
+        <div class="screen" id="screen">
+          <div class="island" aria-hidden="true"></div>
+          <canvas id="game" width="390" height="844"></canvas>
+
+          <section class="overlay menu" id="menu">
+            <div class="hero-orb" aria-hidden="true"></div>
+            <h1>SPARKLANE</h1>
+            <p class="tagline">Dodge the void. Collect the charge.</p>
+            <p class="best" id="menuBest" hidden>BEST <span>0</span></p>
+            <button type="button" class="cta" id="playBtn">PLAY</button>
+            <p class="hint">Tap left or right to switch lanes</p>
+          </section>
+
+          <section class="overlay gameover" id="gameover" hidden>
+            <p class="ended">RUN ENDED</p>
+            <p class="final-score" id="finalScore">0</p>
+            <p class="best-note" id="bestNote">Best 0</p>
+            <div class="row">
+              <button type="button" class="ghost" id="menuBtn">MENU</button>
+              <button type="button" class="cta compact" id="againBtn">AGAIN</button>
+            </div>
+          </section>
+
+          <div class="hud" id="hud" hidden>
+            <span class="score" id="score">0</span>
+            <span class="best-hud" id="hudBest">BEST 0</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <p class="caption">Sparklane · SwiftUI iOS game preview</p>
+  </main>
+  <script src="game.js"></script>
+</body>
+</html>

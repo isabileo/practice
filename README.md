@@ -1,47 +1,35 @@
-# Aura — Stylish charging lock screen for iPhone 17 Pro Max
+# Sparklane — iOS arcade game
 
-When your iPhone is plugged in, **Aura** shows a cinematic charging status — in the app, as a **Lock Screen Live Activity**, and as a **StandBy** face for MagSafe nightstand charging on Pro Max.
+**Sparklane** is a SwiftUI endless lane game for iPhone: dodge void stones, collect charge orbs, and chase a high score.
 
-## Features
+## How to play
 
-- **Immersive charging canvas** — full-bleed battery ring, charge %, and soft OLED motion when USB-C / MagSafe is connected
-- **Random mini scenes from the socket** — flowers, rocket, drone, train, Ferrari, scooter, fish, sparrows, snake, sunrise, popcorn, sea beach (reshuffles every few seconds)
-- **Voltage · Current · Power** — live meters while charging, plus a clear **Fast charging confirmed** badge when on the peak USB-PD curve
-- **Lock Screen Live Activity** — stylish percentage + V/A while the phone is locked
-- **StandBy widget** — landscape charging face for bedside Pro Max use
-- Tuned for **iPhone 17 Pro Max** (6.9″ · 2868×1320 · ~440×956 pt)
-
-> Voltage and current use a typical iPhone 17 Pro Max USB-PD estimate curve. Apple does not expose real charger V/A to third-party apps.
-
+- **Tap left / right** half of the screen to switch between 3 lanes
+- **Collect** teal charge orbs (+10)
+- **Avoid** gray void stones — one hit ends the run
+- Speed ramps up the longer you survive
 
 ## Open in Xcode
 
-1. On a Mac with **Xcode 16+**, open `Aura.xcodeproj`
-2. Select the **Aura** scheme → iPhone 17 Pro Max simulator (or any Pro Max)
+1. On a Mac with **Xcode 16+**, open `Sparklane.xcodeproj`
+2. Select the **Sparklane** scheme → any iPhone simulator
 3. Build & run (`⌘R`)
-4. In Simulator: **Features → Battery → Charging** to preview the charging UI
 
 Deployment target: **iOS 17**.
 
-### Enable Lock Screen Live Activity
-
-After first launch, grant Live Activities when prompted (or Settings → Aura → Live Activities). Plug in a charger — Aura starts/updates the lock-screen activity automatically.
-
-> Apple does not allow third-party apps to replace the system lock-screen battery icon. Aura adds a **Live Activity** and in-app / StandBy charging face beside the system UI.
-
-## Preview without Xcode
+## Preview in the browser
 
 ```bash
-cd preview && python3 -m http.server 8080
+cd game-preview && python3 -m http.server 8080
 ```
 
-Open the page and toggle **Charging** to see the lock-screen style UI at Pro Max size.
+Open the page, tap **PLAY**, then tap left/right (or use ← → / A D).
 
 ## Project layout
 
 | Path | Purpose |
 | --- | --- |
-| `Aura/` | Main SwiftUI app + battery monitor |
-| `AuraChargeWidget/` | Live Activity + StandBy widget extension |
-| `Aura.xcodeproj/` | Xcode project |
-| `preview/` | Interactive web mock |
+| `Sparklane/` | SwiftUI game app (engine, views, theme) |
+| `Sparklane.xcodeproj/` | Xcode project |
+| `game-preview/` | Playable HTML/Canvas preview |
+| `Aura/` | Separate charging lock-screen app (unchanged) |
