@@ -45,3 +45,14 @@ Open the page and toggle **Charging** to see the lock-screen style UI at Pro Max
 | `AuraChargeWidget/` | Live Activity + StandBy widget extension |
 | `Aura.xcodeproj/` | Xcode project |
 | `preview/` | Interactive web mock |
+| `pdf-maker/` | Browser app to type a title + body and download a PDF |
+
+## Patra — Make a PDF
+
+Local web app in `pdf-maker/`. Open `pdf-maker/index.html` or:
+
+```bash
+cd pdf-maker && python3 -m http.server 8080
+```
+
+See [pdf-maker/README.md](pdf-maker/README.md).
