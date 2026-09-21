@@ -659,6 +659,7 @@
   function slugify(title) {
     var s = String(title || "document")
       .trim()
+      .replace(/\.pdf$/i, "")
       .toLowerCase()
       .replace(/[^\w\u0900-\u097F\u0A00-\u0A7F]+/g, "-")
       .replace(/^-+|-+$/g, "");
