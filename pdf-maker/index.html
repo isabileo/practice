@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Patra — Make a PDF</title>
+  <meta name="description" content="Type a title and body, then download a PDF. Runs in your browser." />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="top">
+      <div class="brand">
+        <span class="mark" aria-hidden="true">प</span>
+        <div>
+          <h1>Patra</h1>
+          <p class="tagline">Make a PDF · PDF बनाएं</p>
+        </div>
+      </div>
+      <p class="hint">Everything stays on this computer. Nothing is uploaded.</p>
+    </header>
+
+    <div class="workspace">
+      <form id="form" class="panel" autocomplete="off">
+        <label>
+          <span>Title <em>शीर्षक</em></span>
+          <input id="title" name="title" type="text" maxlength="200" required placeholder="Monthly note" />
+        </label>
+
+        <div class="row">
+          <label>
+            <span>Author <em>optional</em></span>
+            <input id="author" name="author" type="text" maxlength="120" placeholder="Your name" />
+          </label>
+          <label>
+            <span>Date <em>optional</em></span>
+            <input id="date" name="date" type="text" maxlength="40" placeholder="21 Sep 2026" />
+          </label>
+        </div>
+
+        <label>
+          <span>Body <em>लिखत</em></span>
+          <textarea id="body" name="body" required rows="12" placeholder="Write the page here…"></textarea>
+        </label>
+
+        <div class="row">
+          <label>
+            <span>Page size</span>
+            <select id="pageSize" name="pageSize">
+              <option value="a4" selected>A4</option>
+              <option value="letter">Letter</option>
+            </select>
+          </label>
+          <fieldset class="accent-field">
+            <legend>Accent</legend>
+            <label class="swatch"><input type="radio" name="accent" value="rust" checked /> <span class="dot rust"></span> Rust</label>
+            <label class="swatch"><input type="radio" name="accent" value="ink" /> <span class="dot ink"></span> Ink</label>
+            <label class="swatch"><input type="radio" name="accent" value="forest" /> <span class="dot forest"></span> Forest</label>
+          </fieldset>
+        </div>
+
+        <label>
+          <span>File name <em>optional</em></span>
+          <input id="filename" name="filename" type="text" maxlength="80" placeholder="monthly-note.pdf" />
+        </label>
+
+        <div class="actions">
+          <button type="submit" id="download">Download PDF</button>
+          <button type="button" id="sample" class="ghost">Fill sample</button>
+        </div>
+        <p id="status" class="status" role="status"></p>
+      </form>
+
+      <section class="preview-col" aria-label="Page preview">
+        <div class="preview-head">
+          <h2>Preview</h2>
+          <span id="pageMeta" class="page-meta">1 page · A4</span>
+        </div>
+        <div id="preview" class="preview"></div>
+      </section>
+    </div>
+  </div>
+
+  <script src="pdf.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
